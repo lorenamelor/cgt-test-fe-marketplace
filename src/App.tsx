@@ -27,11 +27,9 @@ function App(): JSX.Element {
       {window.location.pathname === '/' && (
         <div>
           Welcome to our shop!
-
           <p>
             You are probably interested in <a href="/products/a">A</a>.
           </p>
-
           <p>
             Check out the newest product <a href="/products/b">B</a>!
           </p>
@@ -81,7 +79,6 @@ function App(): JSX.Element {
       {window.location.pathname === '/cart' && (
         <div>
           Are you ready to purchase these?
-
           <ul>
             {cartItems().map((cartItem) => (
               <li key={cartItem}>{cartItem}</li>
@@ -94,4 +91,3 @@ function App(): JSX.Element {
 }
 
 export default App;
-
