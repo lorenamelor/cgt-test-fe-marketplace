@@ -22,6 +22,13 @@ module.exports = {
       },
     ],
     'react/react-in-jsx-scope': 'off',
+    'react/function-component-definition': [
+      'error',
+      {
+        namedComponents: 'function-declaration',
+        unnamedComponents: 'function-expression',
+      },
+    ],
     complexity: ['error', { max: 9 }],
     'max-lines': ['error', { max: 150, skipComments: true, skipBlankLines: true }],
     'no-implicit-coercion': ['error', { allow: ['!!'] }],

@@ -1,92 +1,39 @@
-import pictureA from './a.jpg';
-import pictureB from './b.jpg';
+import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
+import CartPage from './pages/cart';
+import CheckoutPage from './pages/checkout';
+import CompletePage from './pages/complete';
+import HomePage from './pages/home';
+import ProductPage from './pages/product';
 
-function cartItems(): string[] {
-  return [];
-}
-
-function App(): JSX.Element {
+export function App() {
   return (
-    <main>
-      <header>
-        90s shop
-        <nav>
-          <ul style={{ listStyleType: 'none', display: 'flex' }}>
-            <li>
-              <a href="/">Home</a>
-            </li>
-            <span> | </span>
-            <li>
-              <a href="/cart">Cart ({cartItems().length})</a>
-            </li>
-          </ul>
-        </nav>
-        <hr />
-      </header>
-
-      {window.location.pathname === '/' && (
-        <div>
-          Welcome to our shop!
-          <p>
-            You are probably interested in <a href="/products/a">A</a>.
-          </p>
-          <p>
-            Check out the newest product <a href="/products/b">B</a>!
-          </p>
-        </div>
-      )}
-
-      {window.location.pathname === '/products/b' && (
-        <div>
-          <h1>Product B</h1>
-          <p>Price: 30 USD</p>
-
-          <button
-            type="button"
-            onClick={() => {
-              console.warn('Not implemented!');
-            }}
-          >
-            Add to cart
-          </button>
-
-          <div>
-            <img src={pictureB} width={640} alt="Product B" />
+    <BrowserRouter>
+      <main>
+        <header className="border-b border-slate-200 px-4 py-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xl font-semibold">90s shop</span>
+            <nav>
+              <ul className="flex list-none gap-4 text-sm">
+                <li>
+                  <Link to="/">Home</Link>
+                </li>
+                <li>
+                  <Link to="/cart">Cart</Link>
+                </li>
+              </ul>
+            </nav>
           </div>
-        </div>
-      )}
+        </header>
 
-      {window.location.pathname === '/products/a' && (
-        <div>
-          <h1>Product A</h1>
-          <p>Price: 10 USD</p>
-
-          <button
-            type="button"
-            onClick={() => {
-              console.warn('Not implemented!');
-            }}
-          >
-            Add to cart
-          </button>
-
-          <div>
-            <img src={pictureA} width={640} alt="Product A" />
-          </div>
-        </div>
-      )}
-
-      {window.location.pathname === '/cart' && (
-        <div>
-          Are you ready to purchase these?
-          <ul>
-            {cartItems().map((cartItem) => (
-              <li key={cartItem}>{cartItem}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </main>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/products/:productId" element={<ProductPage />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/complete" element={<CompletePage />} />
+        </Routes>
+      </main>
+    </BrowserRouter>
   );
 }
 
