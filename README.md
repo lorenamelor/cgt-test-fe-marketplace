@@ -13,7 +13,7 @@ see the total amount for payment.
 
 1. Implement MVP cart functionality
 2. Refactor implementation code and tests where you see fit. You have as much freedom here as you wish
-3. Improve the layout and styling of the application. No need to polish too much.
+3. Take UI and UX in consideration. Improve the layout and styles using css/scss
 4. Make sure test suite runs through all of the tests successfully
 
 ## Notes & Requirements
