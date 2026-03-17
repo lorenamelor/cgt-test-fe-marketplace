@@ -8,13 +8,13 @@ export type ProductId =
   | 'cassette-mixtape'
   | 'retro-joystick';
 
-export interface Product {
+export type Product = {
   id: ProductId;
   name: string;
   description: string;
   priceCents: number;
   imageUrl: string;
-}
+};
 
 export const products: Product[] = [
   {

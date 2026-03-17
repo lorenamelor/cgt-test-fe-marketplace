@@ -1,18 +1,18 @@
 import { create } from 'zustand';
 import type { ProductId } from '../../types/product';
 
-export interface CartItem {
+export type CartItem = {
   productId: ProductId;
   quantity: number;
-}
+};
 
-interface CartState {
+type CartState = {
   items: CartItem[];
   addItem: (productId: ProductId, quantity?: number) => void;
   removeItem: (productId: ProductId) => void;
   setQuantity: (productId: ProductId, quantity: number) => void;
   clearCart: () => void;
-}
+};
 
 export const useCartStore = create<CartState>((set) => ({
   items: [],
