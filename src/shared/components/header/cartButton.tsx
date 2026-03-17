@@ -22,4 +22,3 @@ export function CartButton({ count = 0 }: CartButtonProps) {
     </Link>
   );
 }
-
