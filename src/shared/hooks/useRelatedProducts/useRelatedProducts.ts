@@ -10,4 +10,3 @@ export function useRelatedProducts(id: ProductId | string | undefined) {
     enabled: Boolean(id),
   });
 }
-
