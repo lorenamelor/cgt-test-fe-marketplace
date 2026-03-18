@@ -1,0 +1,2 @@
+export { useRelatedProducts } from './useRelatedProducts';
+
