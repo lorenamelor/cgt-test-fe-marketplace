@@ -22,7 +22,7 @@ export const products: Product[] = [
     name: 'Tamagotchi Original',
     description: 'Take care of your pocket virtual pet just like in the 90s.',
     priceCents: 12900,
-    imageUrl: '/images/products/tamagotchi.jpg',
+    imageUrl: '/images/products/tamagotchi.png',
   },
   {
     id: 'game-boy-color',
