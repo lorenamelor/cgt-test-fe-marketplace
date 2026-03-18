@@ -5,12 +5,15 @@ import CompletePage from './pages/complete';
 import HomePage from './pages/home';
 import ProductPage from './pages/product';
 import { RootLayout } from './shared/layouts/rootLayout';
+import { useCartStore } from './shared/stores/cart';
 
 export function App() {
+  const cartCount = useCartStore((s) => s.items.reduce((total, item) => total + item.quantity, 0));
+
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<RootLayout />}>
+        <Route element={<RootLayout cartCount={cartCount} />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/products/:productId" element={<ProductPage />} />
           <Route path="/cart" element={<CartPage />} />
