@@ -1,12 +1,22 @@
 import { ProductCard } from '../../shared/components/productCard';
 import { useCartStore } from '../../shared/stores/cart';
-import { products } from '../../shared/types/product';
+import { useProducts } from '../../shared/hooks/useProducts';
 import { SearchBar } from '../../features/home/components/searchBar';
 import { TrendingTags } from '../../features/home/components/tags';
 
 export function Home() {
   const addItem = useCartStore((s) => s.addItem);
+  const { data: products = [], isPending } = useProducts();
+
   const totalProducts = products.length;
+
+  if (isPending) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <p className="text-slate-500">Loading products...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="px-4 py-16 md:px-6 md:py-24">
