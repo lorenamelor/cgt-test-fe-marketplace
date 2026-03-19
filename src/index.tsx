@@ -4,6 +4,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import App from './App';
 import { queryClient } from './config/query/queryClient';
 import { ErrorBoundary } from './shared/layouts/errorBoundary';
+import { initMocks } from './mocks';
 import reportWebVitals from './reportWebVitals';
 import './index.css';
 
@@ -15,14 +16,16 @@ if (!container) {
 
 const root = ReactDOM.createRoot(container as HTMLElement);
 
-root.render(
-  <React.StrictMode>
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <App />
-      </QueryClientProvider>
-    </ErrorBoundary>
-  </React.StrictMode>,
-);
+initMocks().then(() => {
+  root.render(
+    <React.StrictMode>
+      <ErrorBoundary>
+        <QueryClientProvider client={queryClient}>
+          <App />
+        </QueryClientProvider>
+      </ErrorBoundary>
+    </React.StrictMode>,
+  );
+});
 
 reportWebVitals();
