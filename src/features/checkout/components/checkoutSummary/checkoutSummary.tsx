@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { useCartStore } from '../../../../shared/stores/cart';
 import { products } from '../../../../shared/mocks';
 import { formatCurrency } from '../../../../shared/utils/formatCurrency';
@@ -8,8 +9,19 @@ import { PriceSummary } from '../priceSummary';
 const SHIPPING_CENTS = 999;
 const TAX_RATE = 0.08;
 
+function generateOrderNumber() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  for (let i = 0; i < 8; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return `${result.slice(0, 3)}-${result.slice(3)}`;
+}
+
 export function CheckoutSummary() {
+  const navigate = useNavigate();
   const items = useCartStore((s) => s.items);
+  const clearCart = useCartStore((s) => s.clearCart);
 
   const subtotalCents = items.reduce((total, item) => {
     const product = products.find((p) => p.id === item.productId);
@@ -21,7 +33,9 @@ export function CheckoutSummary() {
   const totalCents = subtotalCents + SHIPPING_CENTS + taxCents;
 
   const handleCompletePurchase = () => {
-    // TODO: integrar com API
+    const orderNumber = generateOrderNumber();
+    clearCart();
+    navigate(`/complete?order=${orderNumber}`);
   };
 
   return (
