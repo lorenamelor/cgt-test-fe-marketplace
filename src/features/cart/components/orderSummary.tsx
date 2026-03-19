@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { formatCurrency } from '../../../shared/utils/formatCurrency';
 
 type OrderSummaryProps = {
@@ -32,12 +33,12 @@ export function OrderSummary({ subtotalCents, itemCount }: OrderSummaryProps) {
         <dd className="text-base font-bold text-primary">{formatCurrency(totalCents)}</dd>
       </div>
 
-      <button
-        type="button"
-        className="mt-5 inline-flex h-11 w-full items-center justify-center rounded-full bg-primary text-sm font-semibold text-white shadow-sm transition hover:opacity-90 active:scale-[0.98]"
+      <Link
+        to="/checkout"
+        className="mt-5 flex h-14 w-full items-center justify-center rounded-xl bg-primary font-semibold text-white transition-all hover:opacity-90 active:scale-[0.97]"
       >
         Proceed to Checkout
-      </button>
+      </Link>
     </aside>
   );
 }
