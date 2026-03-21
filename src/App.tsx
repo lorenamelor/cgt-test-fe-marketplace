@@ -1,12 +1,14 @@
+import { lazy } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
-import CartPage from './pages/cart';
-import CheckoutPage from './pages/checkout';
-import CompletePage from './pages/complete';
 import HomePage from './pages/home';
-import ProductPage from './pages/product';
 import { RootLayout } from './shared/layouts/rootLayout';
 import { useCartStore } from './shared/stores/cart';
+
+const ProductPage = lazy(() => import('./pages/product'));
+const CartPage = lazy(() => import('./pages/cart'));
+const CheckoutPage = lazy(() => import('./pages/checkout'));
+const CompletePage = lazy(() => import('./pages/complete'));
 
 export function App() {
   const cartCount = useCartStore((s) => s.items.reduce((total, item) => total + item.quantity, 0));
