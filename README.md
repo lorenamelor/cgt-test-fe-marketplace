@@ -33,6 +33,7 @@ Good luck!
 - [ADR 0001: Use Zustand for cart store](docs/adr/0001-zustand-cart-store.md)
 - [ADR 0002: Use Tailwind CSS as primary styling approach](docs/adr/0002-tailwind-css.md)
 - [ADR 0003: Route-level lazy loading with Home as eager entrypoint](docs/adr/0003-route-lazy-loading.md)
+- [ADR 0004: Frontend performance baseline for marketplace flows](docs/adr/0004-frontend-performance-baseline.md)
 
 ## Getting Started with Create React App
 

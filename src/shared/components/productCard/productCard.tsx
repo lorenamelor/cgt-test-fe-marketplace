@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import type { Product, ProductId } from '../../types/product';
 import { formatCurrency } from '../../utils/formatCurrency';
@@ -13,7 +14,7 @@ export type ProductCardProps = {
   seller?: string;
 };
 
-export function ProductCard({
+function ProductCardComponent({
   product,
   onAddToCart,
   rating = 0,
@@ -43,3 +44,5 @@ export function ProductCard({
     </article>
   );
 }
+
+export const ProductCard = memo(ProductCardComponent);

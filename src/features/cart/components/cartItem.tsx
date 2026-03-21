@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import type { Product } from '../../../shared/types/product';
 import { formatCurrency } from '../../../shared/utils/formatCurrency';
 import { QuantityStepper } from '../../../shared/components/quantityStepper';
@@ -11,12 +12,23 @@ type CartItemProps = {
   onRemove: () => void;
 };
 
-export function CartItem({ product, quantity, onIncrement, onDecrement, onRemove }: CartItemProps) {
+function CartItemComponent({
+  product,
+  quantity,
+  onIncrement,
+  onDecrement,
+  onRemove,
+}: CartItemProps) {
   return (
     <article className="flex items-center justify-between gap-6 rounded-3xl bg-white px-6 py-5 shadow-[0_18px_40px_rgba(15,23,42,0.08)]">
       <div className="flex items-center gap-4">
         <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl bg-slate-50">
-          <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
+          <img
+            src={product.imageUrl}
+            alt={product.name}
+            loading="lazy"
+            className="h-full w-full object-cover"
+          />
         </div>
 
         <div>
@@ -43,3 +55,5 @@ export function CartItem({ product, quantity, onIncrement, onDecrement, onRemove
     </article>
   );
 }
+
+export const CartItem = memo(CartItemComponent);

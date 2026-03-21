@@ -21,7 +21,12 @@ export function Thumbnails({ product, images, activeIndex, onSelect }: Thumbnail
             index === activeIndex && 'border-primary',
           )}
         >
-          <img src={src} alt={product.name} className="h-full w-full rounded-2xl object-cover" />
+          <img
+            src={src}
+            alt={product.name}
+            loading="lazy"
+            className="h-full w-full rounded-2xl object-cover"
+          />
         </button>
       ))}
     </div>
