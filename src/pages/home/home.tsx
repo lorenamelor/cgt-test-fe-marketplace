@@ -13,7 +13,7 @@ export function Home() {
 
       <div className="px-4 py-16 md:px-6 md:py-24">
         <div className="mx-auto max-w-6xl">
-          <main className="flex flex-col">
+          <section className="flex flex-col">
             <section className="flex flex-col">
               <div className="mx-auto w-full text-center">
                 <h1 className="text-balance text-4xl font-semibold leading-[1.1] text-slate-900 md:text-5xl lg:text-[56px]">
@@ -33,7 +33,7 @@ export function Home() {
               </div>
             </section>
             <TrendingProducts />
-          </main>
+          </section>
         </div>
       </div>
     </>

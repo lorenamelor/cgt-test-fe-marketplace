@@ -6,11 +6,35 @@ export function PaymentForm() {
       <h2 className="text-lg font-semibold text-slate-900">Payment Method</h2>
 
       <div className="mt-6 space-y-5">
-        <Input id="cardNumber" label="Card Number" type="text" placeholder="4242 4242 4242 4242" />
+        <Input
+          id="cardNumber"
+          label="Card Number"
+          type="text"
+          inputMode="numeric"
+          autoComplete="cc-number"
+          required
+          placeholder="4242 4242 4242 4242"
+        />
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <Input id="expiry" label="Expiry" type="text" placeholder="MM/YY" />
-          <Input id="cvv" label="CVV" type="text" placeholder="123" />
+          <Input
+            id="expiry"
+            label="Expiry"
+            type="text"
+            inputMode="numeric"
+            autoComplete="cc-exp"
+            required
+            placeholder="MM/YY"
+          />
+          <Input
+            id="cvv"
+            label="CVV"
+            type="password"
+            inputMode="numeric"
+            autoComplete="cc-csc"
+            required
+            placeholder="123"
+          />
         </div>
       </div>
     </section>

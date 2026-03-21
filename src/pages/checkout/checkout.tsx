@@ -16,7 +16,7 @@ export function Checkout() {
         <div className="mx-auto max-w-5xl">
           <BackLink to="/cart">Back to Cart</BackLink>
 
-          <main className="mt-6 md:mt-8">
+          <section className="mt-6 md:mt-8">
             <h1 className="text-2xl font-semibold text-slate-900 md:text-3xl">Checkout</h1>
 
             <div className="mt-6 grid gap-6 md:mt-8 md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] md:items-start md:gap-8">
@@ -27,7 +27,7 @@ export function Checkout() {
 
               <CheckoutSummary />
             </div>
-          </main>
+          </section>
         </div>
       </div>
     </>

@@ -7,17 +7,60 @@ export function ShippingForm() {
 
       <div className="mt-6 space-y-5">
         <div className="grid gap-4 sm:grid-cols-2">
-          <Input id="firstName" label="First Name" type="text" placeholder="John" />
-          <Input id="lastName" label="Last Name" type="text" placeholder="Doe" />
+          <Input
+            id="firstName"
+            label="First Name"
+            type="text"
+            autoComplete="given-name"
+            required
+            placeholder="John"
+          />
+          <Input
+            id="lastName"
+            label="Last Name"
+            type="text"
+            autoComplete="family-name"
+            required
+            placeholder="Doe"
+          />
         </div>
 
-        <Input id="email" label="Email" type="email" placeholder="john@example.com" />
+        <Input
+          id="email"
+          label="Email"
+          type="email"
+          autoComplete="email"
+          required
+          placeholder="john@example.com"
+        />
 
-        <Input id="address" label="Address" type="text" placeholder="123 Main St" />
+        <Input
+          id="address"
+          label="Address"
+          type="text"
+          autoComplete="street-address"
+          required
+          placeholder="123 Main St"
+        />
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <Input id="city" label="City" type="text" placeholder="New York" />
-          <Input id="zipCode" label="Zip Code" type="text" placeholder="10001" />
+          <Input
+            id="city"
+            label="City"
+            type="text"
+            autoComplete="address-level2"
+            required
+            placeholder="New York"
+          />
+          <Input
+            id="zipCode"
+            label="Zip Code"
+            type="text"
+            inputMode="numeric"
+            autoComplete="postal-code"
+            required
+            placeholder="10001"
+          />
         </div>
       </div>
     </section>

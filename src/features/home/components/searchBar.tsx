@@ -3,7 +3,12 @@ import { Button } from '../../../shared/components/button';
 
 export function SearchBar() {
   return (
-    <div className="relative mx-auto flex w-full max-w-[672px] items-stretch">
+    <form
+      role="search"
+      aria-label="Search products"
+      className="relative mx-auto flex w-full max-w-[672px] items-stretch"
+      onSubmit={(event) => event.preventDefault()}
+    >
       <div className="relative min-w-0 flex-1">
         <SearchIcon
           aria-hidden
@@ -11,13 +16,17 @@ export function SearchBar() {
         />
         <input
           type="text"
+          aria-label="Search products"
           placeholder="Search for retro products..."
           className="h-14 w-full rounded-l-[28px] bg-white pl-14 pr-4 text-[0.9375rem] text-slate-700 placeholder:text-slate-400 shadow-[0_18px_40px_rgba(15,23,42,0.08)] outline-none focus:ring-2 focus:ring-primary/20 transition-shadow"
         />
       </div>
-      <Button className="h-14 w-auto shrink-0 rounded-l-none rounded-r-[28px] px-8 text-[0.9375rem]">
+      <Button
+        type="submit"
+        className="h-14 w-auto shrink-0 rounded-l-none rounded-r-[28px] px-8 text-[0.9375rem]"
+      >
         Search
       </Button>
-    </div>
+    </form>
   );
 }

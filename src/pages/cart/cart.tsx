@@ -14,10 +14,10 @@ export function Cart() {
         <div className="mx-auto max-w-6xl">
           <BackLink to="/">Continue Shopping</BackLink>
 
-          <main className="mt-6 md:mt-8">
+          <section className="mt-6 md:mt-8">
             <h1 className="text-2xl font-semibold text-slate-900 md:text-3xl">Shopping Cart</h1>
             <CartPageSection />
-          </main>
+          </section>
         </div>
       </div>
     </>

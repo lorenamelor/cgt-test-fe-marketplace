@@ -25,15 +25,14 @@ export function ProductContent() {
 
   if (isPending) {
     return (
-      <main className="mt-8 grid gap-10 md:mt-10 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:items-start">
+      <section className="mt-8 grid gap-10 md:mt-10 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:items-start">
         <ProductGallerySkeleton />
         <ProductDetailsSkeleton />
-      </main>
+      </section>
     );
   }
 
   if (!productData) {
-    // Sem mock/fallback: quando não há dado, não renderizamos a página.
     return null;
   }
 
@@ -41,7 +40,7 @@ export function ProductContent() {
 
   return (
     <>
-      <main className="mt-8 grid gap-10 md:mt-10 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:items-start">
+      <section className="mt-8 grid gap-10 md:mt-10 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:items-start">
         <ProductGallery product={productData} />
         <ProductDetails
           product={productData}
@@ -50,7 +49,7 @@ export function ProductContent() {
           reviewCount={124}
           onAddToCart={(id) => addItem(id)}
         />
-      </main>
+      </section>
 
       <RelatedProducts productId={productData.id as ProductId} />
     </>
