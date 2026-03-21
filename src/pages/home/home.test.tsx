@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
+import { HelmetProvider } from 'react-helmet-async';
 import { MemoryRouter } from 'react-router-dom';
 
 import Home from './home';
@@ -21,9 +22,11 @@ function renderHome() {
 
   return render(
     <QueryClientProvider client={queryClient}>
-      <MemoryRouter>
-        <Home />
-      </MemoryRouter>
+      <HelmetProvider>
+        <MemoryRouter>
+          <Home />
+        </MemoryRouter>
+      </HelmetProvider>
     </QueryClientProvider>,
   );
 }
