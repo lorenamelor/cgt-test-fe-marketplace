@@ -8,7 +8,10 @@ export type ProductGalleryProps = {
 };
 
 export function ProductGallery({ product }: ProductGalleryProps) {
-  const images = [product.imageUrl, product.imageUrl, product.imageUrl];
+  const images =
+    product.galleryImageUrls && product.galleryImageUrls.length > 0
+      ? product.galleryImageUrls
+      : [product.imageUrl];
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (

@@ -32,7 +32,7 @@ describe('ProductDetails', () => {
   it('should render product main information matching the design', () => {
     renderDetails();
 
-    expect(screen.getByRole('heading', { name: /game boy color/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: product.name })).toBeInTheDocument();
     expect(screen.getByText('$399.00', { exact: false })).toBeInTheDocument();
     expect(screen.getByText(product.description)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /add to cart/i })).toBeInTheDocument();
