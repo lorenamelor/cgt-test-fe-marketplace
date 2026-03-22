@@ -1,13 +1,17 @@
+import { useLocation } from 'react-router-dom';
 import { BackLink } from '../../shared/components/backLink';
 import { CartPageSection } from '../../features/cart/components/cartPageSection';
 import SeoHead from '../../shared/components/seoHead';
 
 export function Cart() {
+  const { pathname, search } = useLocation();
+
   return (
     <>
       <SeoHead
         title="90s Shop | Cart"
         description="Review selected 90s 3D assets, check quantities, and get ready to complete your order."
+        canonicalPath={`${pathname}${search}`}
       />
 
       <div className="px-4 py-10 md:px-6 md:py-16">

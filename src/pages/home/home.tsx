@@ -3,8 +3,10 @@ import { TrendingTags } from '../../features/home/components/tags';
 import { TrendingProducts } from '../../features/home/components/trendingProducts';
 import SeoHead from '../../shared/components/seoHead';
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 export function Home() {
+  const { pathname, search } = useLocation();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTag, setSelectedTag] = useState('');
 
@@ -13,6 +15,7 @@ export function Home() {
       <SeoHead
         title="90s Shop | Home"
         description="Shop curated 90s-inspired 3D assets for games, renders, and nostalgic digital worlds."
+        canonicalPath={`${pathname}${search}`}
       />
 
       <div className="px-4 py-16 md:px-6 md:py-24">

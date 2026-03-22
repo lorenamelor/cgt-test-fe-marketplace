@@ -1,5 +1,5 @@
 import { FormProvider, useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { BackLink } from '../../shared/components/backLink';
 import { ShippingForm } from '../../features/checkout/components/shippingForm';
 import { PaymentForm } from '../../features/checkout/components/paymentForm';
@@ -12,6 +12,7 @@ import { useCartStore } from '../../shared/stores/cart';
 const CHECKOUT_FORM_ID = 'checkout-form';
 
 export function Checkout() {
+  const { pathname, search } = useLocation();
   const navigate = useNavigate();
   const clearCart = useCartStore((s) => s.clearCart);
   const methods = useForm<CheckoutFormValues>({
@@ -40,6 +41,7 @@ export function Checkout() {
       <SeoHead
         title="90s Shop | Checkout"
         description="Secure your order and complete checkout for high-quality 90s-themed 3D assets."
+        canonicalPath={`${pathname}${search}`}
       />
 
       <div className="px-4 py-10 md:px-6 md:py-16">

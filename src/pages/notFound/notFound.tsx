@@ -1,13 +1,16 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import SeoHead from '../../shared/components/seoHead';
 
 export function NotFound() {
+  const { pathname, search } = useLocation();
+
   return (
     <>
       <SeoHead
         title="90s Shop | Page not found"
         description="The page you are looking for does not exist or has been moved."
         noIndex
+        canonicalPath={`${pathname}${search}`}
       />
 
       <div className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center bg-[#F4F6F8] px-4 text-center">

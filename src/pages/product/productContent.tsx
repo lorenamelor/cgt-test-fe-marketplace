@@ -8,18 +8,31 @@ import { ProductDetails } from '../../features/product/components/productDetails
 import { RelatedProducts } from '../../features/product/components/relatedProducts';
 import { ProductGallerySkeleton } from '../../features/product/components/productGallery/productGallerySkeleton';
 import { ProductDetailsSkeleton } from '../../features/product/components/productDetails/productDetailsSkeleton';
+import { ErrorState } from '../../shared/components/errorState';
 
 export function ProductContent() {
   const { productId } = useParams();
   const navigate = useNavigate();
   const addItem = useCartStore((s) => s.addItem);
 
-  const { data: productData, isPending, isError } = useProduct(productId ?? '');
+  const {
+    data: productData,
+    isPending,
+    isError,
+    isRefetching,
+    refetch,
+  } = useProduct(productId ?? '');
 
   if (isError) {
     return (
-      <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-600">
-        We couldn&apos;t load this product. Please try again later.
+      <div className="mt-8 md:mt-10">
+        <ErrorState
+          message={"We couldn't load this product. Please try again later."}
+          isRetrying={isRefetching}
+          onRetry={() => {
+            void refetch();
+          }}
+        />
       </div>
     );
   }
