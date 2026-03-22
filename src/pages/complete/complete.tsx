@@ -1,4 +1,4 @@
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { ReactComponent as CheckCircleIcon } from '../../shared/assets/check-circle.svg';
 import { ReactComponent as PackageIcon } from '../../shared/assets/package.svg';
 import { ReactComponent as ArrowRightIcon } from '../../shared/assets/arrow-right.svg';
@@ -6,7 +6,6 @@ import { Button } from '../../shared/components/button';
 import SeoHead from '../../shared/components/seoHead';
 
 export function Complete() {
-  const { pathname, search } = useLocation();
   const [searchParams] = useSearchParams();
   const orderNumber = searchParams.get('order') ?? '---';
 
@@ -16,7 +15,7 @@ export function Complete() {
         title="90s Shop | Complete"
         description="Order complete at 90s Shop. Download-ready retro 3D assets are now in your purchase flow."
         noIndex
-        canonicalPath={`${pathname}${search}`}
+        canonicalPath="/complete"
       />
 
       <div className="mx-auto max-w-2xl px-4 py-20 text-center">

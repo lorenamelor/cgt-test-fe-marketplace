@@ -20,19 +20,22 @@ export function SeoHead({
   canonicalPath,
   imageUrl,
 }: SeoHeadProps) {
-  const absoluteImage = `${window.location.origin}${imageUrl ?? DEFAULT_OG_IMAGE_PATH}`;
+  const origin = window.location.origin;
+  const absoluteImage = `${origin}${imageUrl ?? DEFAULT_OG_IMAGE_PATH}`;
+  const canonicalUrl = `${origin}${canonicalPath}`;
 
   return (
     <Helmet>
       <title>{title}</title>
       <meta name="description" content={description} />
+      <link rel="canonical" href={canonicalUrl} />
       {noIndex ? <meta name="robots" content="noindex, nofollow" /> : null}
 
       <meta property="og:site_name" content={SITE_NAME} />
       <meta property="og:type" content="website" />
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
-      <meta property="og:url" content={`${window.location.origin}${canonicalPath}`} />
+      <meta property="og:url" content={canonicalUrl} />
       <meta property="og:image" content={absoluteImage} />
 
       <meta name="twitter:card" content="summary_large_image" />

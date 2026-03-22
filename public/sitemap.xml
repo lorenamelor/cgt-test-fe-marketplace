@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Rotas fixas do shell (home, carrinho, checkout). URLs de produto = sitemap dinâmico quando o catálogo vier da API. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://cgt-test-fe-marketplace-one.vercel.app/</loc></url>
+  <url><loc>https://cgt-test-fe-marketplace-one.vercel.app/cart</loc></url>
+  <url><loc>https://cgt-test-fe-marketplace-one.vercel.app/checkout</loc></url>
+</urlset>
