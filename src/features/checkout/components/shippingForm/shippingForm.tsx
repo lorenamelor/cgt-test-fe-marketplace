@@ -3,7 +3,6 @@ import { Input } from '../../../../shared/components/input';
 import type { CheckoutFormValues } from '../../types/checkoutFormValues';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const ZIP_PATTERN = /^\d{5}(-\d{4})?$/;
 
 export function ShippingForm() {
   const {
@@ -77,17 +76,13 @@ export function ShippingForm() {
           />
           <Input
             id="zipCode"
-            label="Zip Code"
+            label="Postal code"
             type="text"
-            inputMode="numeric"
             autoComplete="postal-code"
-            placeholder="10001"
+            placeholder="e.g. 10001, SW1A 1AA, LT-01103"
             required
             error={errors.zipCode?.message}
-            {...register('zipCode', {
-              required: 'Zip code is required',
-              pattern: { value: ZIP_PATTERN, message: 'Use 5 digits or ZIP+4' },
-            })}
+            {...register('zipCode', { required: 'Postal code is required' })}
           />
         </div>
       </div>
