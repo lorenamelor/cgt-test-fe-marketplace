@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom';
 import { useCartStore } from '../../../../shared/stores/cart';
 import { products } from '../../../../shared/mocks';
 import { formatCurrency } from '../../../../shared/utils/formatCurrency';
@@ -9,19 +8,12 @@ import { PriceSummary } from '../priceSummary';
 const SHIPPING_CENTS = 999;
 const TAX_RATE = 0.08;
 
-function generateOrderNumber() {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let result = '';
-  for (let i = 0; i < 8; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return `${result.slice(0, 3)}-${result.slice(3)}`;
-}
+type CheckoutSummaryProps = {
+  checkoutFormId: string;
+};
 
-export function CheckoutSummary() {
-  const navigate = useNavigate();
+export function CheckoutSummary({ checkoutFormId }: CheckoutSummaryProps) {
   const items = useCartStore((s) => s.items);
-  const clearCart = useCartStore((s) => s.clearCart);
 
   const subtotalCents = items.reduce((total, item) => {
     const product = products.find((p) => p.id === item.productId);
@@ -31,12 +23,6 @@ export function CheckoutSummary() {
 
   const taxCents = Math.round(subtotalCents * TAX_RATE);
   const totalCents = subtotalCents + SHIPPING_CENTS + taxCents;
-
-  const handleCompletePurchase = () => {
-    const orderNumber = generateOrderNumber();
-    clearCart();
-    navigate(`/complete?order=${orderNumber}`);
-  };
 
   return (
     <aside className="h-fit rounded-3xl bg-white px-6 py-6 shadow-[0_18px_40px_rgba(15,23,42,0.08)] md:px-8 md:py-8">
@@ -70,7 +56,7 @@ export function CheckoutSummary() {
         <span className="text-lg font-bold text-primary">{formatCurrency(totalCents)}</span>
       </div>
 
-      <Button className="mt-5" onClick={handleCompletePurchase}>
+      <Button className="mt-5" type="submit" form={checkoutFormId}>
         Complete Purchase
       </Button>
     </aside>

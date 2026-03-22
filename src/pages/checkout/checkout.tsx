@@ -1,10 +1,40 @@
+import { FormProvider, useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 import { BackLink } from '../../shared/components/backLink';
 import { ShippingForm } from '../../features/checkout/components/shippingForm';
 import { PaymentForm } from '../../features/checkout/components/paymentForm';
 import { CheckoutSummary } from '../../features/checkout/components/checkoutSummary';
 import SeoHead from '../../shared/components/seoHead';
+import type { CheckoutFormValues } from '../../features/checkout/types/checkoutFormValues';
+import { generateOrderNumber } from '../../features/checkout/utils/generateOrderNumber';
+import { useCartStore } from '../../shared/stores/cart';
+
+const CHECKOUT_FORM_ID = 'checkout-form';
 
 export function Checkout() {
+  const navigate = useNavigate();
+  const clearCart = useCartStore((s) => s.clearCart);
+  const methods = useForm<CheckoutFormValues>({
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      address: '',
+      city: '',
+      zipCode: '',
+      cardNumber: '',
+      expiry: '',
+      cvv: '',
+    },
+    mode: 'onSubmit',
+  });
+
+  const onSubmit = (_data: CheckoutFormValues) => {
+    const orderNumber = generateOrderNumber();
+    clearCart();
+    navigate(`/complete?order=${orderNumber}`);
+  };
+
   return (
     <>
       <SeoHead
@@ -19,14 +49,21 @@ export function Checkout() {
           <section className="mt-6 md:mt-8">
             <h1 className="text-2xl font-semibold text-slate-900 md:text-3xl">Checkout</h1>
 
-            <div className="mt-6 grid gap-6 md:mt-8 md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] md:items-start md:gap-8">
-              <div className="space-y-6">
-                <ShippingForm />
-                <PaymentForm />
-              </div>
+            <FormProvider {...methods}>
+              <div className="mt-6 grid gap-6 md:mt-8 md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] md:items-start md:gap-8">
+                <form
+                  id={CHECKOUT_FORM_ID}
+                  className="space-y-6"
+                  onSubmit={methods.handleSubmit(onSubmit)}
+                  noValidate
+                >
+                  <ShippingForm />
+                  <PaymentForm />
+                </form>
 
-              <CheckoutSummary />
-            </div>
+                <CheckoutSummary checkoutFormId={CHECKOUT_FORM_ID} />
+              </div>
+            </FormProvider>
           </section>
         </div>
       </div>
