@@ -12,6 +12,8 @@ export function TrendingProducts({ searchTerm, selectedTag }: TrendingProductsPr
     data: products,
     isError,
     isPending,
+    isRefetching,
+    refetch,
   } = useProducts({
     search: searchTerm,
     tag: selectedTag,
@@ -20,12 +22,20 @@ export function TrendingProducts({ searchTerm, selectedTag }: TrendingProductsPr
 
   return (
     <section className="mt-16 md:mt-20">
-      <TrendingProductsHeader isPending={isPending} totalProducts={totalProducts} />
+      <TrendingProductsHeader
+        isPending={isPending}
+        isError={isError}
+        totalProducts={totalProducts}
+      />
       <TrendingProductsGrid
         isPending={isPending}
         isError={isError}
+        isRetrying={isRefetching}
         products={products ?? []}
         searchTerm={searchTerm}
+        onRetry={() => {
+          void refetch();
+        }}
       />
     </section>
   );

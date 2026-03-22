@@ -1,10 +1,15 @@
 type TrendingProductsHeaderProps = {
   isPending: boolean;
+  isError: boolean;
   totalProducts: number;
 };
 
-export function TrendingProductsHeader({ isPending, totalProducts }: TrendingProductsHeaderProps) {
-  const totalCount = isPending ? '...' : totalProducts;
+export function TrendingProductsHeader({
+  isPending,
+  isError,
+  totalProducts,
+}: TrendingProductsHeaderProps) {
+  const totalCount = isPending ? '...' : isError ? '—' : totalProducts;
 
   return (
     <div className="mb-6 flex flex-col gap-2 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">

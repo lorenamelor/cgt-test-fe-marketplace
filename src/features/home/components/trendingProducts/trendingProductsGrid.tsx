@@ -1,6 +1,8 @@
 import { ProductCard, ProductCardSkeleton } from '../../../../shared/components/productCard';
 import { useCartStore } from '../../../../shared/stores/cart';
 import type { Product } from '../../../../shared/types/product';
+import { EmptyState } from '../emptyState';
+import { ErrorState } from '../errorState';
 
 const GRID_CLASS = 'grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-4';
 
@@ -10,6 +12,8 @@ type TrendingProductsGridProps = {
   products: Product[];
   isPending: boolean;
   isError: boolean;
+  isRetrying: boolean;
+  onRetry: () => void;
   searchTerm: string;
 };
 
@@ -17,6 +21,8 @@ export function TrendingProductsGrid({
   products,
   isPending,
   isError,
+  isRetrying,
+  onRetry,
   searchTerm,
 }: TrendingProductsGridProps) {
   const addItem = useCartStore((s) => s.addItem);
@@ -32,24 +38,11 @@ export function TrendingProductsGrid({
   }
 
   if (isError) {
-    return (
-      <div className="rounded-2xl border border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-600">
-        We couldn&apos;t load trending products. Please try again later.
-      </div>
-    );
+    return <ErrorState isRetrying={isRetrying} onRetry={onRetry} />;
   }
 
   if (products.length === 0) {
-    const trimmedSearchTerm = searchTerm.trim();
-    const emptyMessage = trimmedSearchTerm
-      ? `No products found for "${trimmedSearchTerm}".`
-      : 'No products available right now.';
-
-    return (
-      <div className="rounded-2xl border border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-600">
-        {emptyMessage}
-      </div>
-    );
+    return <EmptyState searchTerm={searchTerm} />;
   }
 
   return (
