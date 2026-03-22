@@ -1,28 +1,25 @@
-import { http, HttpResponse, delay } from 'msw';
+import { http, HttpResponse } from 'msw';
 import { products } from '../shared/mocks/products';
 
 export const handlers = [
   http.get('/api/products', async () => {
-    await delay(300);
-    return HttpResponse.json(products);
+    return HttpResponse.json(products, { status: 200 });
   }),
 
   http.get('/api/products/:id', async ({ params }) => {
-    await delay(200);
-    const { id } = params;
+    const id = String(params.id);
     const product = products.find((p) => p.id === id);
 
     if (!product) {
       return new HttpResponse(null, { status: 404 });
     }
 
-    return HttpResponse.json(product);
+    return HttpResponse.json(product, { status: 200 });
   }),
 
   http.get('/api/products/:id/related', async ({ params }) => {
-    await delay(250);
-    const { id } = params;
+    const id = String(params.id);
     const relatedProducts = products.filter((p) => p.id !== id).slice(0, 4);
-    return HttpResponse.json(relatedProducts);
+    return HttpResponse.json(relatedProducts, { status: 200 });
   }),
 ];

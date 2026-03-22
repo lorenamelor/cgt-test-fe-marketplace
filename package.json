@@ -25,7 +25,7 @@
     "autoprefixer": "^10.4.27",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
-    "msw": "^2.12.13",
+    "msw": "^2.12.14",
     "postcss": "^8.5.8",
     "prettier": "^3.8.1",
     "tailwindcss": "^3.4.17",
@@ -43,6 +43,11 @@
     "extends": [
       "react-app",
       "react-app/jest"
+    ]
+  },
+  "jest": {
+    "transformIgnorePatterns": [
+      "/node_modules/(?!(axios|msw|until-async|@bundled-es-modules)/)"
     ]
   },
   "browserslist": {
