@@ -28,4 +28,12 @@ initMocks().then(() => {
   );
 });
 
-reportWebVitals();
+reportWebVitals(
+  process.env.NODE_ENV === 'development'
+    ? (metric) => {
+        // Core Web Vitals (LCP, INP, CLS, etc.) — em produção, ligar a um endpoint de analytics.
+        // eslint-disable-next-line no-console -- intentional dev-only observability
+        console.log(`[web-vitals] ${metric.name}:`, metric.value, metric);
+      }
+    : undefined,
+);

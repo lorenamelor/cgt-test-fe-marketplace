@@ -1,6 +1,10 @@
+import { useDebouncer } from '../../../../shared/hooks/useDebouncer';
 import { useProducts } from '../../../../shared/hooks/useProducts';
 import { TrendingProductsGrid } from './trendingProductsGrid';
 import { TrendingProductsHeader } from './trendingProductsHeader';
+
+// ~0.35s debounce after typing stops
+const SEARCH_DEBOUNCE_MS = 350;
 
 type TrendingProductsProps = {
   searchTerm: string;
@@ -8,6 +12,8 @@ type TrendingProductsProps = {
 };
 
 export function TrendingProducts({ searchTerm, selectedTag }: TrendingProductsProps) {
+  const debouncedSearch = useDebouncer(searchTerm, SEARCH_DEBOUNCE_MS);
+
   const {
     data: products,
     isError,
@@ -15,7 +21,7 @@ export function TrendingProducts({ searchTerm, selectedTag }: TrendingProductsPr
     isRefetching,
     refetch,
   } = useProducts({
-    search: searchTerm,
+    search: debouncedSearch,
     tag: selectedTag,
   });
   const totalProducts = products?.length ?? 0;
