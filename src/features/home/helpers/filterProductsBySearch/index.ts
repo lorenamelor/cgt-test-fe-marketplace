@@ -1,0 +1,1 @@
+export { filterProductsBySearch } from './filterProductsBySearch';

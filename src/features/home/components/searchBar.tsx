@@ -1,7 +1,12 @@
 import { ReactComponent as SearchIcon } from '../../../shared/assets/search.svg';
 import { Button } from '../../../shared/components/button';
 
-export function SearchBar() {
+type SearchBarProps = {
+  value: string;
+  onChange: (value: string) => void;
+};
+
+export function SearchBar({ value, onChange }: SearchBarProps) {
   return (
     <form
       role="search"
@@ -17,8 +22,10 @@ export function SearchBar() {
         <input
           type="text"
           aria-label="Search products"
-          placeholder="Search for retro products..."
+          placeholder="Search retro products..."
           className="h-14 w-full rounded-l-[28px] bg-white pl-14 pr-4 text-[0.9375rem] text-slate-700 placeholder:text-slate-400 shadow-[0_18px_40px_rgba(15,23,42,0.08)] outline-none focus:ring-2 focus:ring-primary/20 transition-shadow"
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
         />
       </div>
       <Button

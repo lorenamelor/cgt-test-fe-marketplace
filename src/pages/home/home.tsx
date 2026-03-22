@@ -2,8 +2,11 @@ import { SearchBar } from '../../features/home/components/searchBar';
 import { TrendingTags } from '../../features/home/components/tags';
 import { TrendingProducts } from '../../features/home/components/trendingProducts';
 import SeoHead from '../../shared/components/seoHead';
+import { useState } from 'react';
 
 export function Home() {
+  const [searchTerm, setSearchTerm] = useState('');
+
   return (
     <>
       <SeoHead
@@ -20,19 +23,19 @@ export function Home() {
                   Discover Retro 90s Products
                 </h1>
                 <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-500 md:mt-5">
-                  Explore nostalgic products inspired by the 1990s.
+                  Explore nostalgic 3D models inspired by the 1990s.
                 </p>
               </div>
 
               <div className="mx-auto mt-10 w-full max-w-[672px] md:mt-12">
-                <SearchBar />
+                <SearchBar value={searchTerm} onChange={setSearchTerm} />
               </div>
 
               <div className="mx-auto mt-8 w-full max-w-4xl md:mt-10">
                 <TrendingTags />
               </div>
             </section>
-            <TrendingProducts />
+            <TrendingProducts searchTerm={searchTerm} />
           </section>
         </div>
       </div>

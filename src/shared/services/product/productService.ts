@@ -1,8 +1,14 @@
 import { httpClient } from '../httpClient';
 import type { Product, ProductId } from '../../types/product';
 
-export async function getProducts(): Promise<Product[]> {
-  const response = await httpClient.get<Product[]>('/products');
+type GetProductsParams = {
+  search?: string;
+};
+
+export async function getProducts({ search }: GetProductsParams = {}): Promise<Product[]> {
+  const response = await httpClient.get<Product[]>('/products', {
+    params: { search },
+  });
   return response.data;
 }
 
