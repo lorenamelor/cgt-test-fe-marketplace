@@ -14,7 +14,7 @@ We use **Zustand** as the state library for the cart store (`src/shared/stores/c
 
 - The store holds `items: CartItem[]` and exposes actions: `addItem`, `removeItem`, `setQuantity`, `clearCart`.
 - Components subscribe only to the slices they need (e.g. `useCartStore((s) => s.items)` or selectors) to keep re-renders minimal.
-- No persistence layer is implemented in this ADR; persistence (e.g. localStorage) can be added later via a Zustand middleware if required.
+- **Persistence:** The cart uses Zustand’s **`persist`** middleware with **`localStorage`**, so we did not hand-roll sync (`useEffect`, JSON, hydration). The same store the UI reads is what gets saved; we **`partialize`** to persist only `items`. That ease of persistence was an intentional part of choosing Zustand.
 
 ## Alternatives considered
 
@@ -25,10 +25,16 @@ We use **Zustand** as the state library for the cart store (`src/shared/stores/c
 
 **Zustand**
 
-- Pros: Small API, minimal boilerplate, selective subscriptions to limit re-renders; lightweight; works outside React if needed.
+- Pros: Small API, minimal boilerplate, selective subscriptions to limit re-renders; lightweight; works outside React if needed; **official `persist` middleware** for `localStorage` / custom storage without duplicating sync logic.
 - Cons: Extra dependency; team convention needed for store shape and selectors; no built-in devtools (middleware can be added).
+
+**Ad-hoc `localStorage` + React state (Context or otherwise)**
+
+- Pros: No middleware to learn.
+- Cons: Easy to drift from in-memory state; manual hydration, error handling, and migrations; more code and tests to maintain for the same outcome.
 
 ## References
 
 - [Zustand – GitHub](https://github.com/pmndrs/zustand)
 - [Zustand – Usage with selectors](https://github.com/pmndrs/zustand#using-zustand-with-selectors)
+- [Zustand – Persisting store data (`persist`)](https://github.com/pmndrs/zustand/blob/main/docs/integrations/persisting-store-data.md)
