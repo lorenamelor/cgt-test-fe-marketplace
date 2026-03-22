@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 
-const DEFAULT_OG_IMAGE_PATH = '/logo512.png';
+const DEFAULT_OG_IMAGE_PATH = '/90s-shop.png';
 const SITE_NAME = '90s Shop';
 
 type SeoHeadProps = {
@@ -9,7 +9,7 @@ type SeoHeadProps = {
   noIndex?: boolean;
   /** Site-root path + optional query for og:url (must start with `/`, e.g. `/products/x`) */
   canonicalPath: string;
-  /** Site-root path for og:image (must start with `/`); default `/logo512.png` */
+  /** Site-root path for og:image (must start with `/`); default `/90s-shop.png` */
   imageUrl?: string;
 };
 
