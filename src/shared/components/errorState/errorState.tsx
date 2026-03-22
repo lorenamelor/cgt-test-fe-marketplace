@@ -1,14 +1,15 @@
-import { Button } from '../../../../shared/components/button';
+import { Button } from '../button';
 
-type ErrorStateProps = {
+export type ErrorStateProps = {
+  message: string;
   isRetrying: boolean;
   onRetry: () => void;
 };
 
-export function ErrorState({ isRetrying, onRetry }: ErrorStateProps) {
+export function ErrorState({ message, isRetrying, onRetry }: ErrorStateProps) {
   return (
     <div className="flex flex-col items-center rounded-2xl border border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-600">
-      <p>We couldn&apos;t load trending products. Please try again later.</p>
+      <p>{message}</p>
       <Button
         type="button"
         variant="secondary"

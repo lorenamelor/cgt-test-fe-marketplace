@@ -20,7 +20,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Can be integrated with a logging service (Sentry, LogRocket, etc.) later
+    // Can be integrated with a logging service (Sentry, etc.) later
     // eslint-disable-next-line no-console
     console.error('Uncaught error in ErrorBoundary', error, errorInfo);
   }
@@ -42,7 +42,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
             <div className="mt-6">
               <Button type="button" onClick={this.handleReload}>
-                Reload page
+                Try again
               </Button>
             </div>
           </div>

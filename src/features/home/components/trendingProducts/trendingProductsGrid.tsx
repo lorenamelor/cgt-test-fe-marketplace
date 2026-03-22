@@ -1,8 +1,8 @@
 import { ProductCard, ProductCardSkeleton } from '../../../../shared/components/productCard';
+import { ErrorState } from '../../../../shared/components/errorState';
 import { useCartStore } from '../../../../shared/stores/cart';
 import type { Product } from '../../../../shared/types/product';
 import { EmptyState } from '../emptyState';
-import { ErrorState } from '../errorState';
 
 const GRID_CLASS = 'grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-4';
 
@@ -38,7 +38,13 @@ export function TrendingProductsGrid({
   }
 
   if (isError) {
-    return <ErrorState isRetrying={isRetrying} onRetry={onRetry} />;
+    return (
+      <ErrorState
+        message={"We couldn't load trending products. Please try again later."}
+        isRetrying={isRetrying}
+        onRetry={onRetry}
+      />
+    );
   }
 
   if (products.length === 0) {

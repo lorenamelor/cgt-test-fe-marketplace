@@ -1,4 +1,5 @@
 import { ProductCard } from '../../../../shared/components/productCard';
+import { ErrorState } from '../../../../shared/components/errorState';
 import { useRelatedProducts } from '../../../../shared/hooks/useRelatedProducts';
 import type { ProductId } from '../../../../shared/types/product';
 import { useCartStore } from '../../../../shared/stores/cart';
@@ -10,10 +11,33 @@ type RelatedProductsProps = {
 export function RelatedProducts({ productId }: RelatedProductsProps) {
   const addItem = useCartStore((s) => s.addItem);
 
-  const { data, isPending: isLoading, isError, error } = useRelatedProducts(productId);
+  const {
+    data,
+    isPending: isLoading,
+    isError,
+    isRefetching,
+    refetch,
+  } = useRelatedProducts(productId);
 
-  if (isLoading || isError || error) {
+  if (isLoading) {
     return null;
+  }
+
+  if (isError) {
+    return (
+      <section className="mt-14 md:mt-16">
+        <h2 className="text-xl font-semibold text-slate-900 md:text-2xl">Related Products</h2>
+        <div className="mt-6">
+          <ErrorState
+            message={"We couldn't load related products. Please try again later."}
+            isRetrying={isRefetching}
+            onRetry={() => {
+              void refetch();
+            }}
+          />
+        </div>
+      </section>
+    );
   }
 
   const relatedProducts = data ?? [];
