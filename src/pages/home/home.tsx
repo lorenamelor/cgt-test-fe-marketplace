@@ -6,6 +6,7 @@ import { useState } from 'react';
 
 export function Home() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedTag, setSelectedTag] = useState('');
 
   return (
     <>
@@ -20,7 +21,7 @@ export function Home() {
             <section className="flex flex-col">
               <div className="mx-auto w-full text-center">
                 <h1 className="text-balance text-4xl font-semibold leading-[1.1] text-slate-900 md:text-5xl lg:text-[56px]">
-                  Discover Retro 90s Products
+                  Discover Retro 90s 3D models
                 </h1>
                 <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-500 md:mt-5">
                   Explore nostalgic 3D models inspired by the 1990s.
@@ -32,10 +33,10 @@ export function Home() {
               </div>
 
               <div className="mx-auto mt-8 w-full max-w-4xl md:mt-10">
-                <TrendingTags />
+                <TrendingTags selectedTag={selectedTag} onSelectTag={setSelectedTag} />
               </div>
             </section>
-            <TrendingProducts searchTerm={searchTerm} />
+            <TrendingProducts searchTerm={searchTerm} selectedTag={selectedTag} />
           </section>
         </div>
       </div>

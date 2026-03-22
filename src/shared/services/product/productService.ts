@@ -3,11 +3,12 @@ import type { Product, ProductId } from '../../types/product';
 
 type GetProductsParams = {
   search?: string;
+  tag?: string;
 };
 
-export async function getProducts({ search }: GetProductsParams = {}): Promise<Product[]> {
+export async function getProducts({ search, tag }: GetProductsParams = {}): Promise<Product[]> {
   const response = await httpClient.get<Product[]>('/products', {
-    params: { search },
+    params: { search, tag },
   });
   return response.data;
 }

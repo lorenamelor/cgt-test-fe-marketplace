@@ -1,15 +1,17 @@
 import { http, HttpResponse } from 'msw';
 import { products } from '../shared/mocks/products';
-import { filterProductsBySearch } from '../features/home/helpers';
+import { filterProductsBySearch, filterProductsByTag } from '../features/home/helpers';
 
 export const handlers = [
   http.get('/api/products', async ({ request }) => {
     const url = new URL(request.url);
     const search = url.searchParams.get('search') ?? '';
+    const tag = url.searchParams.get('tag') ?? '';
 
-    // In production this filtering should happen in the real API/data layer.
-    // We keep it here only so the local MSW mock can simulate backend search behavior.
-    const filteredProducts = filterProductsBySearch(products, search);
+    // In production these filters should happen in the real API/data layer.
+    // We keep them here only so the local MSW mock can simulate backend behavior.
+    const productsBySearch = filterProductsBySearch(products, search);
+    const filteredProducts = filterProductsByTag(productsBySearch, tag);
 
     return HttpResponse.json(filteredProducts, { status: 200 });
   }),

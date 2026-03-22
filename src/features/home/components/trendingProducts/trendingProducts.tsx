@@ -4,10 +4,18 @@ import { TrendingProductsHeader } from './trendingProductsHeader';
 
 type TrendingProductsProps = {
   searchTerm: string;
+  selectedTag: string;
 };
 
-export function TrendingProducts({ searchTerm }: TrendingProductsProps) {
-  const { data: products, isError, isPending } = useProducts({ search: searchTerm });
+export function TrendingProducts({ searchTerm, selectedTag }: TrendingProductsProps) {
+  const {
+    data: products,
+    isError,
+    isPending,
+  } = useProducts({
+    search: searchTerm,
+    tag: selectedTag,
+  });
   const totalProducts = products?.length ?? 0;
 
   return (

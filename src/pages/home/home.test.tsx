@@ -66,4 +66,15 @@ describe('Home - integration (MSW + React Query)', () => {
       await screen.findByText(/no products found for "produto-inexistente"\./i),
     ).toBeInTheDocument();
   });
+
+  it('should filter products by selected tag', async () => {
+    renderHome();
+
+    await screen.findByRole('heading', { name: products[0].name });
+
+    await userEvent.click(screen.getByRole('button', { name: /alien/i }));
+
+    expect(await screen.findByRole('heading', { name: /sas operator/i })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /retro boombox/i })).not.toBeInTheDocument();
+  });
 });

@@ -136,7 +136,7 @@ export const products: Product[] = [
   },
   {
     id: 'game-boy-color',
-    name: 'Alien Creature',
+    name: 'SAS Operator',
     description:
       'Biomechanical alien character with all related creature images grouped in the same product gallery.',
     priceCents: 39900,
@@ -158,18 +158,22 @@ export const products: Product[] = [
   },
   {
     id: 'retro-joystick',
-    name: 'Astronaut Suit',
+    name: 'Alien Warlord',
     description:
-      'High-detail orange astronaut suit model for sci-fi scenes, cinematic key art, and space mission concepts.',
-    priceCents: 7900,
-    imageUrl: '/images/products/astronaut-suit-01.jpg',
-    galleryImageUrls: ['/images/products/astronaut-suit-01.jpg'],
+      'High-detail alien warrior model built for retro sci-fi scenes, key art, and creature-focused game environments.',
+    priceCents: 27900,
+    imageUrl: '/images/products/alien-statue-fanart-3d-model-1bb3184571.jpg',
+    galleryImageUrls: [
+      '/images/products/alien-statue-fanart-3d-model-1bb3184571.jpg',
+      '/images/products/alien-statue-fanart-3d-model-bd56f37b26.jpg',
+      '/images/products/alien-statue-fanart-3d-model-71e188431d.jpg',
+    ],
     details: [
-      { label: 'Collection', value: 'Space Gear' },
-      { label: 'Edition', value: 'A' },
+      { label: 'Collection', value: 'Creature Assets' },
+      { label: 'Edition', value: 'C' },
       { label: 'Condition', value: 'Mint' },
-      { label: 'Category', value: 'Astronaut Suit' },
-      { label: 'Material', value: 'Fabric & Composite' },
+      { label: 'Category', value: 'Alien Character' },
+      { label: 'Material', value: 'Digital Sculpt' },
       { label: 'Authenticity', value: 'Verified 3D Asset' },
     ],
   },

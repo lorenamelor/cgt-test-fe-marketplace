@@ -1,0 +1,1 @@
+export { filterProductsByTag } from './filterProductsByTag';
