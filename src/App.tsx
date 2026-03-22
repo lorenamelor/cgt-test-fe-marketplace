@@ -2,6 +2,7 @@ import { lazy } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import HomePage from './pages/home';
+import NotFoundPage from './pages/notFound';
 import { RootLayout } from './shared/layouts/rootLayout';
 import { useCartStore } from './shared/stores/cart';
 
@@ -23,6 +24,7 @@ export function App() {
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/complete" element={<CompletePage />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
