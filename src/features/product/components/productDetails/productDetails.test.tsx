@@ -13,6 +13,7 @@ function renderDetails(overrides: Partial<ProductDetailsProps> = {}) {
   ];
 
   const onAddToCart = jest.fn();
+  const onAddAndGoToCart = jest.fn();
 
   const result = render(
     <ProductDetails
@@ -21,11 +22,12 @@ function renderDetails(overrides: Partial<ProductDetailsProps> = {}) {
       rating={4.2}
       reviewCount={124}
       onAddToCart={onAddToCart}
+      onAddAndGoToCart={onAddAndGoToCart}
       {...overrides}
     />,
   );
 
-  return { ...result, onAddToCart };
+  return { ...result, onAddToCart, onAddAndGoToCart };
 }
 
 describe('ProductDetails', () => {
@@ -36,6 +38,7 @@ describe('ProductDetails', () => {
     expect(screen.getByText('$399.00', { exact: false })).toBeInTheDocument();
     expect(screen.getByText(product.description)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /add to cart/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /add and go to cart/i })).toBeInTheDocument();
   });
 
   it('should render product detail rows', () => {
@@ -53,6 +56,14 @@ describe('ProductDetails', () => {
     fireEvent.click(screen.getByRole('button', { name: /add to cart/i }));
 
     expect(onAddToCart).toHaveBeenCalledWith(product.id);
+  });
+
+  it('should call onAddAndGoToCart when clicking Add and Go to Cart', () => {
+    const { onAddAndGoToCart } = renderDetails();
+
+    fireEvent.click(screen.getByRole('button', { name: /add and go to cart/i }));
+
+    expect(onAddAndGoToCart).toHaveBeenCalledWith(product.id);
   });
 });
 

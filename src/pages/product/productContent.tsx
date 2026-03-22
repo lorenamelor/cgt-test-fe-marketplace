@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useProduct } from '../../shared/hooks/useProduct';
 import { useCartStore } from '../../shared/stores/cart';
 import type { ProductId } from '../../shared/types/product';
@@ -11,6 +11,7 @@ import { ProductDetailsSkeleton } from '../../features/product/components/produc
 
 export function ProductContent() {
   const { productId } = useParams();
+  const navigate = useNavigate();
   const addItem = useCartStore((s) => s.addItem);
 
   const { data: productData, isPending, isError } = useProduct(productId ?? '');
@@ -48,6 +49,10 @@ export function ProductContent() {
           rating={4.2}
           reviewCount={124}
           onAddToCart={(id) => addItem(id)}
+          onAddAndGoToCart={(id) => {
+            addItem(id);
+            navigate('/cart');
+          }}
         />
       </section>
 

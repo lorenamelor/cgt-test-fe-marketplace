@@ -12,7 +12,8 @@ export function ProductDetailsSkeleton() {
         <Skeleton className="h-4 w-96 rounded" />
       </div>
 
-      <div className="mt-6">
+      <div className="mt-6 flex w-full flex-col gap-3">
+        <Skeleton className="h-14 w-full rounded-xl" />
         <Skeleton className="h-14 w-full rounded-xl" />
       </div>
 
