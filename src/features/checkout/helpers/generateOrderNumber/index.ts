@@ -1,0 +1,1 @@
+export { generateOrderNumber } from './generateOrderNumber';

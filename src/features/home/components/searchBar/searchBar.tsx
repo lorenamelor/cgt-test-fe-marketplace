@@ -1,5 +1,5 @@
-import { ReactComponent as SearchIcon } from '../../../shared/assets/search.svg';
-import { Button } from '../../../shared/components/button';
+import { ReactComponent as SearchIcon } from '../../../../shared/assets/search.svg';
+import { Button } from '../../../../shared/components/button';
 
 type SearchBarProps = {
   value: string;

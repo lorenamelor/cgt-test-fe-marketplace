@@ -40,6 +40,30 @@ describe('Home - integration (MSW + React Query)', () => {
     expect(
       await screen.findByText(/we couldn't load trending products\. please try again later\./i),
     ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^try again$/i })).toBeInTheDocument();
+  });
+
+  it('should reload products when Try again is clicked after a failed request', async () => {
+    let attempts = 0;
+    server.use(
+      http.get('/api/products', () => {
+        attempts += 1;
+        if (attempts === 1) {
+          return new HttpResponse(null, { status: 500 });
+        }
+        return HttpResponse.json(products);
+      }),
+    );
+
+    renderHome();
+
+    expect(
+      await screen.findByText(/we couldn't load trending products\. please try again later\./i),
+    ).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: /^try again$/i }));
+
+    expect(await screen.findByRole('heading', { name: products[0].name })).toBeInTheDocument();
   });
 
   it('should filter products by search term', async () => {

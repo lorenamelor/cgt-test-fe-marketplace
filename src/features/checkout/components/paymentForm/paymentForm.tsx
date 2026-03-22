@@ -1,7 +1,7 @@
 import { Controller, useFormContext } from 'react-hook-form';
 import { Input } from '../../../../shared/components/input';
 import type { CheckoutFormValues } from '../../types/checkoutFormValues';
-import { formatCardNumber, formatCvv, formatExpiry } from '../../utils/inputMasks';
+import { formatCardNumber, formatCvv, formatExpiry } from '../../helpers/inputMasks';
 
 const EXPIRY_PATTERN = /^(0[1-9]|1[0-2])\/\d{2}$/;
 const CVV_PATTERN = /^\d{3,4}$/;

@@ -1,4 +1,4 @@
-import { Tag } from '../../../shared/components/tag';
+import { Tag } from '../../../../shared/components/tag';
 
 const popularTags = [
   'Gaming',

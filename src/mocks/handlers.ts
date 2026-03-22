@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import { products } from '../shared/mocks/products';
-import { filterProductsBySearch, filterProductsByTag } from '../features/home/helpers';
+import { filterProductsBySearch } from '../features/home/helpers/filterProductsBySearch';
+import { filterProductsByTag } from '../features/home/helpers/filterProductsByTag';
 
 export const handlers = [
   http.get('/api/products', async ({ request }) => {

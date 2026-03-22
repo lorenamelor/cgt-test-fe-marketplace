@@ -6,7 +6,7 @@ import { PaymentForm } from '../../features/checkout/components/paymentForm';
 import { CheckoutSummary } from '../../features/checkout/components/checkoutSummary';
 import SeoHead from '../../shared/components/seoHead';
 import type { CheckoutFormValues } from '../../features/checkout/types/checkoutFormValues';
-import { generateOrderNumber } from '../../features/checkout/utils/generateOrderNumber';
+import { generateOrderNumber } from '../../features/checkout/helpers/generateOrderNumber';
 import { useCartStore } from '../../shared/stores/cart';
 
 const CHECKOUT_FORM_ID = 'checkout-form';

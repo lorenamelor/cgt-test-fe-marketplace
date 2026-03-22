@@ -1,7 +1,7 @@
-import { ProductCard } from '../../../shared/components/productCard';
-import { useRelatedProducts } from '../../../shared/hooks/useRelatedProducts';
-import type { ProductId } from '../../../shared/types/product';
-import { useCartStore } from '../../../shared/stores/cart';
+import { ProductCard } from '../../../../shared/components/productCard';
+import { useRelatedProducts } from '../../../../shared/hooks/useRelatedProducts';
+import type { ProductId } from '../../../../shared/types/product';
+import { useCartStore } from '../../../../shared/stores/cart';
 
 type RelatedProductsProps = {
   productId: ProductId;
