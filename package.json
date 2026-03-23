@@ -43,6 +43,7 @@
     "start": "craco start",
     "build": "craco build",
     "test": "craco test",
+    "test:ci": "cross-env CI=true craco test",
     "analyze": "cross-env ANALYZE=true craco build",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\"",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,css,md}\"",
