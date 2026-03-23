@@ -1,65 +1,122 @@
-# Marketplace MVP
+# 90s Shop — Marketplace MVP (frontend)
 
-**Front-end** storefront MVP for a **3D marketplace–style** experience: browse products, manage a cart, and complete a **checkout-style** journey. Scope stays intentionally tight—credible UI/UX, client state, tests, and documented engineering choices—without a real payments backend or catalog service.
+**Frontend-only marketplace MVP:** **home** catalog, **product detail**, **cart** (multiple line items), **checkout**, and **confirmation**. There is no backend or real payments — **HTTP requests are simulated with [MSW](https://mswjs.io/)** (same contract in the browser and in Jest tests).
 
-**APIs are mocked** with [MSW](https://mswjs.io/) in local development and in the test suite, so the project runs end-to-end with no live server. The same handlers keep dev and tests aligned on the HTTP contract.
+**Flow:** Home → Product → Cart → Checkout → Completion page (order number in the URL query).
 
-**Capabilities:** **Home** (discovery and filters) → **Product** detail → **Cart** (multiple line items, quantity updates, remove) → **Checkout** and order **Complete**, with **consistent totals** from cart through summary.
+**Production demo (Vercel):** [https://cgt-test-fe-marketplace-one.vercel.app/](https://cgt-test-fe-marketplace-one.vercel.app/)
 
 ---
 
 ## Table of contents
 
-- [Getting started](#getting-started)
+- [Overview and features](#overview-and-features)
+- [How to run](#how-to-run)
+- [Deploy on Vercel](#deploy-on-vercel)
 - [Scripts](#scripts)
-- [Tech stack & engineering decisions](#tech-stack--engineering-decisions)
-- [Features implemented](#features-implemented)
-- [Architecture & folder structure](#architecture--folder-structure)
+- [CRACO and bundle analysis](#craco-and-bundle-analysis)
+- [Stack, choices, trade-offs, and tests](#stack-choices-trade-offs-and-tests)
 - [Performance](#performance)
 - [SEO](#seo)
 - [Accessibility](#accessibility)
-- [Design process & UI direction](#design-process--ui-direction)
-- [Testing strategy](#testing-strategy)
+- [Architecture and folders](#architecture-and-folders)
+- [Conventions, commits, and maintainability](#conventions-commits-and-maintainability)
+- [Design, UX/UI, and Lovable prototyping](#design-uxui-and-lovable-prototyping)
+- [Practices in this version: conventions and AI](#practices-in-this-version-conventions-and-ai)
+- [Future improvements (real product)](#future-improvements-real-product)
 - [Original brief](#original-brief)
-- [Architecture Decision Records](#architecture-decision-records)
+- [ADRs (Architecture Decision Records)](#adrs-architecture-decision-records)
 - [Create React App](#create-react-app)
 
 ---
 
-## Getting started
+## Overview and features
 
-**Requirements:** Node.js LTS and npm.
+- **Navigation:** routes for home, product, cart, checkout, and confirmation; layout with cart count.
+- **Cart:** add, change quantity, remove; persistence with Zustand **`persist`** → `localStorage` (`90s-shop:cart`).
+- **Checkout:** React Hook Form (validation on submit); **order placement** via **`POST /api/orders`** (mocked by MSW). Submit uses **TanStack React Query** `useMutation` (`useCreateOrder`); the **`createOrder`** service uses the **native `fetch` API** so response bodies behave reliably under **MSW + JSDOM** in tests (catalog calls still use the shared **Axios** client — see [ADR 0007](docs/adr/0007-axios-http-client.md)). On success, the cart is cleared and the app navigates to **`/complete?order=…`**.
+- **Confirmation:** order number from the URL query.
+- **Error Boundary** so render errors do not take down the entire app.
+
+---
+
+## How to run
+
+**Requirements:** Node.js (LTS) and npm.
 
 ```bash
 npm install
 npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Product APIs are mocked in development via **MSW** (see `src/mocks` and [`handlers.ts`](src/mocks/handlers.ts)).
+Opens [http://localhost:3000](http://localhost:3000). MSW intercepts the API in development (`src/mocks`, [`handlers.ts`](src/mocks/handlers.ts)). Production build: see [Scripts](#scripts) (`npm run build` → `build/`). Published demo: [Vercel](https://cgt-test-fe-marketplace-one.vercel.app/).
 
-**Production build**
+---
 
-```bash
-npm run build
-```
+## Deploy on Vercel
 
-Output is written to `build/`.
+**Production URL:** [https://cgt-test-fe-marketplace-one.vercel.app/](https://cgt-test-fe-marketplace-one.vercel.app/)
+
+Decision recorded in [ADR 0011](docs/adr/0011-vercel-deployment.md).
+
+For this MVP (CRA + React Router), [Vercel](https://vercel.com) provides deploy with **low operational overhead**: HTTPS, CDN, and **CI/CD** tied to Git.
+
+### Why Vercel for this project
+
+- **Git → build → URL:** push to the production branch triggers install, `npm run build`, and publishing of artifacts.
+- **Preview** deployments on branches/PRs (depending on integration).
+- **CRA** detected with `build/` output by default.
+- **History and rollback** in the dashboard.
+- **Free tier** suitable for demos.
+
+### Updating the site
+
+1. **Commit** + **`git push`** to the production branch (e.g. `main`).
+2. Vercel rebuilds and updates the deploy — **you do not need to upload the `build/` folder manually.**
+
+### SPA and `vercel.json`
+
+With **`BrowserRouter`**, refreshing on `/cart` or `/products/...` requires serving **`index.html`**. [`vercel.json`](vercel.json) defines the rewrite for the SPA.
+
+### MSW in production
+
+`initMocks()` in [`src/index.tsx`](src/index.tsx) runs before render in all environments; [`public/mockServiceWorker.js`](public/mockServiceWorker.js) is included in the deploy. With a **real API**, you should call `initMocks()` only in development.
 
 ---
 
 ## Scripts
 
-| Command | Purpose |
-|---------|---------|
-| `npm start` | Dev server with fast refresh |
-| `npm test` | Jest + Testing Library (interactive watch by default) |
-| `npm run build` | Optimized production bundle |
-| `npm run lint` | ESLint on `src/**/*.{js,jsx,ts,tsx}` |
-| `npm run format` | Prettier write for common source formats |
+| Command           | Purpose                                                      |
+| ----------------- | ------------------------------------------------------------ |
+| `npm start`       | Dev server (fast refresh)                                    |
+| `npm test`        | Jest + Testing Library (watch by default)                  |
+| `npm run test:ci` | Same suite, **single run** (used by the `pre-push` hook)     |
+| `npm run build`   | Production bundle → `build/` folder                          |
+| `npm run lint`    | ESLint on `src/**/*.{js,jsx,ts,tsx}`                         |
+| `npm run format`  | Prettier (write) for configured formats                     |
+| `npm run analyze` | Production build + interactive bundle report (see below)   |
 
 ---
 
-## Tech stack & engineering decisions
+## CRACO and bundle analysis
+
+[Create React App](https://create-react-app.dev/) does not expose Webpack configuration by default. This project uses **[CRACO](https://craco.js.org/)** (`@craco/craco`) to **customize Webpack without `eject`**: `start`, `build`, and `test` scripts go through CRACO, which delegates to `react-scripts` with the extended config in [`craco.config.js`](craco.config.js).
+
+**What CRACO enables here (and later):**
+
+- **Today:** register **[webpack-bundle-analyzer](https://github.com/webpack-contrib/webpack-bundle-analyzer)** only when you want to inspect the bundle (environment variable `ANALYZE=true`, see `analyze` script).
+- **Ahead:** the same `craco.config.js` can host other Webpack tweaks (e.g. `splitChunks`, import aliases, extra plugins) while keeping CRA upgradeable without copying the entire config into the repo.
+
+### `npm run analyze`
+
+- **How:** from the project root, run `npm run analyze` (uses `cross-env` on Windows and macOS/Linux).
+- **What happens:** a production `craco build` runs; at the end the webpack-bundle-analyzer **interactive report** opens in the browser (treemap by module size). The process may keep running until you exit with **Ctrl+C**.
+- **Why:** see **what weighs** in JavaScript (dependencies vs. app code), to inform **code splitting**, lazy routes, or library swaps.
+- **Deploy / CI:** the normal **`npm run build` does not** include the analyzer; it runs only when you use `npm run analyze` (or `ANALYZE=true`) explicitly.
+
+---
+
+## Stack, choices, trade-offs, and tests
 
 <p align="left">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" />
@@ -75,204 +132,321 @@ Output is written to `build/`.
   <img alt="npm" src="https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white" />
 </p>
 
-Below, each choice is framed as **what problem it solves**, **what I picked**, and **what I consciously gave up**—the same structure as the ADRs, in condensed form. For full context and alternatives, follow the ADR links.
+Each block summarizes **context → decision → trade-off**. Where an ADR exists, it is linked.
 
-### TypeScript
+### TypeScript (strict)
 
-- **Problem:** Cart lines, product IDs, and API DTOs are easy to get wrong with plain JavaScript; refactors break silently and tests become the only safety net.
-- **Decision:** TypeScript across `src/` so shapes are explicit at boundaries (store, services, components).
-- **Trade-off:** Slightly more ceremony than JS; worth it when the brief asks for refactors and new features on an existing codebase.
+- **Goal:** **consistent typing** for props, state, API responses, and helpers — fewer bugs from wrong data shapes and safer refactors.
+- **Decision:** TypeScript in `src/` with explicit types at boundaries (store, services, components).
+- **Trade-off:** more verbosity than plain JS.
+- **ADR:** *no dedicated ADR* (cross-cutting baseline).
 
 ### TanStack React Query
 
-- **Problem:** Product lists and detail views need loading/error/success states, cache coherence, and no duplicate in-flight requests when the same data is needed in multiple places.
-- **Decision:** React Query with a shared `QueryClient` and stable query keys (`src/config/query/`).
-- **Trade-off:** Another concept in the stack vs. raw `useEffect` + `fetch`; the library encodes patterns (stale times, retries) that would otherwise scatter across components.
+- **Goal:** **server request state and cache** for products (loading, error, data) in one place, with **cache reuse** and **deduplication** instead of many `useEffect` + `useState` pairs per screen. **Mutations** are used for **checkout** (`useCreateOrder` wrapping `POST /api/orders`).
+- **Decision:** global `QueryClient`, keys in `src/config/query/`, cache tuning as needed.
+- **Trade-off:** learning curve vs. ad hoc `fetch`.
+- **ADR:** [0006](docs/adr/0006-tanstack-react-query.md).
 
 ### React Router v6
 
-- **Problem:** A marketplace needs shareable URLs (`/products/:id`), predictable back/forward behavior, and layout composition (header + outlet).
-- **Decision:** Declarative routes in `App.tsx` with a layout route for the shell.
-- **Trade-off:** SPA routing still means no SSR out of the box—documented under [SEO](#seo).
+- **Goal:** shareable URLs, browser history, and layout with outlet.
+- **Decision:** declarative routes + layout.
+- **Trade-off:** SPA without native SSR (see [SEO](#seo)).
+- **ADR:** *no dedicated Router ADR*; route lazy loading in [0003](docs/adr/0003-route-lazy-loading.md).
 
 ### Zustand + `persist` (cart)
 
-- **Problem:** Cart state is shared (header badge, cart page, product/checkout) and must survive refresh without hand-written `localStorage` sync that can drift from in-memory state.
-- **Decision:** Single store with selectors for fine-grained subscriptions; **`persist`** middleware with `partialize` so only `items` hit storage (key `90s-shop:cart`).
-- **Trade-off:** Extra dependency vs. Context + `useReducer`; selective subscriptions and official persistence won. **Full write-up:** [ADR 0001: Zustand cart store](docs/adr/0001-zustand-cart-store.md).
+- **Goal:** shared cart state (header, product, cart, checkout) and persistence after refresh.
+- **Decision:** store with **`persist`** and **`partialize`**. With **selectors** (`useCartStore((s) => s.items.length)`), each component **re-renders only when its subscribed slice changes** — components that do not use that state are not pulled in by unrelated updates.
+- **Trade-off:** extra dependency vs. Context + `useReducer`.
+- **ADR:** [0001](docs/adr/0001-zustand-cart-store.md).
+
+### React Hook Form (checkout)
+
+- **Goal:** long form without re-rendering the whole tree on every keystroke.
+- **Decision:** `FormProvider` + validation on submit; submit handler triggers **`useCreateOrder`** with form values + cart line items.
+- **Trade-off:** library API vs. manual state.
+- **ADR:** [0008](docs/adr/0008-react-hook-form-checkout.md).
 
 ### Tailwind CSS
 
-- **Problem:** Inconsistent spacing/colors and global CSS side effects slow UI iteration; the brief explicitly calls for improved layout and styles at scale.
-- **Decision:** Tokens in `tailwind.config`, utilities in JSX, repeated patterns extracted into components (`Button`, `Card`, `ProductCard`). `clsx` + `tailwind-merge` avoid conflicting class strings.
-- **Trade-off:** Verbose class lists in JSX vs. SCSS modules—mitigated by components. **Full write-up:** [ADR 0002: Tailwind as primary styling](docs/adr/0002-tailwind-css.md).
+- **Goal:** consistent UI (tokens, breakpoints) and **lean final CSS**: JIT **only includes classes used** in analyzed code — not a huge stylesheet of unused utilities.
+- **Decision:** `tailwind.config.js`, `cn` with `clsx` + `tailwind-merge`, shared components.
+- **Trade-off:** long class strings in JSX vs. CSS modules.
+- **ADR:** [0002](docs/adr/0002-tailwind-css.md).
 
-### Axios + MSW
+### Axios + MSW (+ `fetch` for order POST)
 
-- **Problem:** HTTP calls need one place for base URL/headers later; tests must not hit the real network.
-- **Decision:** Axios-based service layer; MSW intercepts the same API surface in dev and Jest (`jest` `transformIgnorePatterns` adjusted for ESM deps).
-- **Trade-off:** `fetch` is “free”; Axios + MSW is a deliberate choice for testability and future interceptors.
+- **Goal:** single HTTP client for catalog (base URL, future interceptors) and **tests without the network** using the same contract as in dev. **Order placement** uses **`fetch`** in `createOrder` so POST response bodies are reliable under **MSW + JSDOM**; catalog continues to use the shared Axios instance.
+- **Decision:** instance in `src/shared/services/httpClient`; MSW in the browser and in Jest; `POST /api/orders` handler in [`handlers.ts`](src/mocks/handlers.ts).
+- **Trade-off:** Axios bundle cost vs. native `fetch` for reads; one targeted `fetch` call for mutations.
+- **ADR:** [0007](docs/adr/0007-axios-http-client.md), [0005](docs/adr/0005-msw-api-mocking.md).
 
-### Create React App (Webpack under the hood)
+### Create React App
 
-- **Problem:** The exercise started from CRA; ejecting would add maintenance noise without being asked.
-- **Decision:** Stay on `react-scripts` and use what it provides (hashed assets, production minification) while optimizing inside the app (lazy routes, memoization, images).
-- **Trade-off:** Less control than Vite/turbopack; acceptable for a time-boxed assessment.
+- **Goal:** start from the exercise template without ejecting.
+- **Decision:** `react-scripts` + app-level optimizations.
+- **Trade-off:** less bundler control than Vite/Next.
+- **ADR:** *no dedicated ADR*.
 
 ### ESLint + Prettier
 
-- **Problem:** Mixed formatting and noisy diffs in PRs.
-- **Decision:** `eslint-config-prettier` / `eslint-plugin-prettier` so lint and format don’t fight.
+- **Goal:** one style and readable PRs.
+- **Decision:** Prettier integrated into the lint flow.
+- **ADR:** *no dedicated ADR*.
 
-**Also in use (no badge):** [react-helmet-async](https://github.com/staylor/react-helmet-async) (document head per route), [Testing Library](https://testing-library.com/) + Jest, [web-vitals](https://web.dev/vitals/). **Icons:** inline SVG instead of an icon font—smaller, tree-shakeable surface.
+**Also in use:** [react-helmet-async](https://github.com/staylor/react-helmet-async) — **ADR** [0009](docs/adr/0009-seo-react-helmet-async-spa.md). [web-vitals](https://web.dev/vitals/) — see [Performance](#performance). **Icons:** inline SVG.
 
----
+### Testing strategy
 
-## Features implemented
-
-- **Navigation:** Home, product detail, cart, checkout, and order-complete views; shared layout with live cart count.
-- **Cart MVP:** Add from listing/detail, change quantity, remove lines; persistence via Zustand **`persist`** → **`localStorage`**. See [ADR 0001](docs/adr/0001-zustand-cart-store.md).
-- **Totals:** Single derived source for line totals and order summary (store + formatting helpers).
-- **UX:** Lazy-route and data loading states; empty cart state; focus rings on interactive elements ([ADR 0002](docs/adr/0002-tailwind-css.md) for design-system-style components).
-
----
-
-## Architecture & folder structure
-
-- **`src/pages`:** Route-level composition (thin); wires features and shared layout.
-- **`src/features`:** Vertical slices (home, product, cart, checkout) with colocated UI.
-- **`src/shared`:** Design-system-style components, hooks, services, stores used across features.
-
-**Cross-cutting decisions**
-
-| Topic | Decision | ADR |
-|--------|-----------|-----|
-| Where new JS downloads on first visit | Home **eager**; product, cart, checkout, complete **lazy** | [ADR 0003](docs/adr/0003-route-lazy-loading.md) |
-| Cart state & persistence | Zustand store + `persist` | [ADR 0001](docs/adr/0001-zustand-cart-store.md) |
-| Styling system | Tailwind + reusable components | [ADR 0002](docs/adr/0002-tailwind-css.md) |
-| List/image/render baseline | Memo + lazy images + Web Vitals hook | [ADR 0004](docs/adr/0004-frontend-performance-baseline.md) |
-
-**Error boundary** wraps the tree below `QueryClientProvider` so React errors don’t blank the whole app; the boundary is written so a production **error reporting** integration (e.g. Sentry) is a small additive change, not a rewrite.
+1. **MSW** defines the HTTP contract once; browser and Jest share the same handlers — **ADR** [0005](docs/adr/0005-msw-api-mocking.md).
+2. **Testing Library** with queries aligned to what the **user** sees (`getByRole`, `findBy*`).
+3. **Layers:** pure functions; isolated components; integration with `MemoryRouter` + `QueryClientProvider` + `src/config/test/`.
+4. Centralized **`customRender`** to avoid repeating providers.
 
 ---
-
-> **Delivery focus:** The next three sections—**[Performance](#performance)**, **[SEO](#seo)**, and **[Accessibility](#accessibility)**—are deliberate highlights: each maps to concrete implementation choices (and ADRs where applicable), not polish added at the last minute.
 
 ## Performance
 
-**Goal:** Respect Core Web Vitals thinking on a CRA SPA: less JS on the critical path, stable lists, and sane image loading.
+**Goal:** Core Web Vitals and a reasonable bundle in a CRA SPA: less JS on the first screen, stable lists, images with a clear strategy.
 
-| Lever | What we did | Why it matters | ADR |
-|--------|-------------|----------------|-----|
-| **Initial JS** | Route-level `React.lazy`; Home stays eager | Smaller parse/compile on first load; landing stays snappy | [ADR 0003](docs/adr/0003-route-lazy-loading.md) |
-| **Re-renders** | `React.memo` on `ProductCard`, `CartItem` when props are stable | Fewer wasted renders in grids and cart lists | [ADR 0004](docs/adr/0004-frontend-performance-baseline.md) |
-| **Images** | `loading="lazy"` off critical path; main product image eager | Protects **LCP** on PDP while saving bandwidth on grids | [ADR 0004](docs/adr/0004-frontend-performance-baseline.md) |
-| **Measurement** | `web-vitals` loaded from `index.tsx` | Ready to pipe to analytics without restructuring | [ADR 0004](docs/adr/0004-frontend-performance-baseline.md) |
+| Lever        | Implementation                                                | Why it matters | ADR   |
+| ------------ | ------------------------------------------------------------- | -------------- | ----- |
+| Initial JS   | `React.lazy` per route; Home eager                            | Less critical JS | [0003](docs/adr/0003-route-lazy-loading.md) |
+| Re-renders   | `React.memo` on cards/list items where it helps               | Less work in lists | [0004](docs/adr/0004-frontend-performance-baseline.md) |
+| Images       | `loading="lazy"` in grids; product hero eager                 | LCP and bandwidth | [0004](docs/adr/0004-frontend-performance-baseline.md) |
+| Data         | React Query: **cache and state** for requests (avoids duplicate fetch/state) | UX and network | [0006](docs/adr/0006-tanstack-react-query.md) |
+| Cart         | Zustand selectors                                             | Only subscribers re-render | [0001](docs/adr/0001-zustand-cart-store.md) |
+| Measurement  | `web-vitals` at bootstrap (below)                             | Baseline for real metrics | [0004](docs/adr/0004-frontend-performance-baseline.md) |
 
-**Honest ceiling:** Without SSR/edge caching, TTFB and first HTML remain CRA-shaped; the ADRs document what we optimized *inside* that constraint.
+**Ceiling:** without SSR/edge, the first HTML is still the CRA shell.
+
+### Web Vitals — what it does and how to see it
+
+The **web-vitals** library records metrics such as **LCP**, **CLS**, **FCP**, **TTFB** (and **FID** in the legacy API). In [`src/index.tsx`](src/index.tsx), when **`NODE_ENV === 'development'`**, those metrics are logged to **`console.log`** with the `[web-vitals]` prefix.
+
+**How to check:** `npm start`, open the app, **DevTools → Console**, navigate and interact; lines appear with metric name and value. In **production** the callback is off by default — the typical next step is sending `metric` to your analytics (custom endpoint, Vercel Analytics, etc.).
 
 ---
 
 ## SEO
 
-**Problem:** Search engines and social previews care about stable titles, descriptions, and crawl policy; a CRA SPA ships one `index.html` shell.
+**Context:** in CRA, the initial HTML is a shell until JS runs; you can still improve sharing, titles, and signals for tools.
 
-**Decisions**
+**Implemented in this project**
 
-1. **`react-helmet-async`** (`SeoHead`) sets per-route **`<title>`** and **meta description** so each URL has intentional metadata when JS runs.
-2. **`noindex`** on transactional flows (e.g. checkout/complete) so those URLs don’t compete with commercial landing pages in the index.
+1. **`SeoHead` + react-helmet-async:** per-route `title` and meta **description**.
+2. **Open Graph and Twitter Cards** (`og:title`, `og:description`, `og:url`, `og:image`, `twitter:card`, etc.) per page, with configurable image on the product page.
+3. **`<link rel="canonical">`** per page (absolute URL from `canonicalPath`). The **Complete** page uses a fixed canonical `/complete` (no order query), aligned with **noindex**.
+4. **`public/robots.txt`:** allows crawling and points to the **sitemap** (absolute demo deploy URL).
+5. **`public/sitemap.xml`:** only **fixed** shell routes (home, cart, checkout). **Product URLs** are not listed — with a dynamic catalog, the right step is an **API-generated sitemap** (see [Future improvements](#future-improvements-real-product)); hand-maintained product IDs in XML go stale quickly and do not scale.
+6. **Semantic HTML** and coherent headings; **alt** on product images where appropriate.
 
-**Trade-offs**
+**Note:** If you change the production domain, update **`public/sitemap.xml`** and the **Sitemap** line in **`public/robots.txt`** to match your site.
 
-- **SPA reality:** Content still hydrates client-side; aggressive SEO (marketplace category pages, editorial content) would want **SSR/SSG** (Next.js, Remix, or a thin BFF)—out of scope for the starter repo but called out explicitly here.
-- **No separate ADR:** This is a small, localized choice; the important part is **knowing the limit** of client-only SEO and naming the next step.
+**Trade-off:** crawlers without JS still mostly see the shell; strong SEO at scale usually needs **SSR/SSG** — see [Future improvements](#future-improvements-real-product).
 
 ---
 
 ## Accessibility
 
-**Problem:** Marketplaces are dense UIs (grids, icon buttons, filters); without intent, keyboard and screen-reader users get left behind.
+Store UIs are dense (grids, icons, filters). Approach in code:
 
-**Decisions (examples in code)**
+- **`aria-label`** on icon-only controls; **`aria-pressed`** where state behaves like a toggle.
+- **`focus-visible`** on shared buttons/links — **ADR** [0002](docs/adr/0002-tailwind-css.md).
+- Lazy route fallback: **`role="status"`**, **`aria-live`**, **`aria-busy`** — **ADR** [0003](docs/adr/0003-route-lazy-loading.md).
+- **`aria-hidden`** on redundant decoration when text already describes the content.
 
-- **Regions & names:** `aria-label` on icon-only controls (cart, account), `aria-pressed` on tag filters, labeled sections for gallery and product info.
-- **Keyboard:** Visible `focus-visible` rings on `Button` / links (Tailwind `focus:ring-*`)—see [ADR 0002](docs/adr/0002-tailwind-css.md) for the shared component layer.
-- **Loading:** Lazy route fallback uses `role="status"` + `aria-live="polite"` + `aria-busy` so loading isn’t silent.
-- **Decoration:** Stars and icons marked `aria-hidden` when text already conveys meaning.
-
-**Trade-off:** Manual audits don’t scale forever; a production line would add **axe** in CI and a skip link—documented here as follow-up, not claimed as done.
-
-**ADR link:** Lazy loading and fallback behavior tie to [ADR 0003](docs/adr/0003-route-lazy-loading.md) (when users wait for a chunk, we expose that state accessibly).
+**Possible evolution:** global skip link, periodic manual audits — outside the minimal scope of this README.
 
 ---
 
-## Design process & UI direction
+## Architecture and folders
 
-### Planning with Lovable (AI-assisted)
+- **`src/pages`:** thin composition per route.
+- **`src/features`:** home, product, cart, checkout (UI and domain logic colocated).
+- **`src/shared`:** cross-cutting components, `httpClient`, stores, utils, shared types.
+- **`src/config`:** query keys, test utilities (`customRender` with Router + `QueryClient`).
 
-Before writing production UI, I **planned screens and layout flows** using **[Lovable](https://lovable.dev)** as an AI-assisted design and prototyping tool. The aim was to **compress exploration time** (layout variants, hierarchy, spacing) while staying close to **patterns users already know** from modern e-commerce: scannable grids, obvious primary actions, and a clear path from discovery to checkout.
+**Why features + shared?** Changes stay localized by flow; only truly cross-cutting code lives in `shared`.
 
-**Lovable prototype (add your share URL):** [Open project on Lovable](https://lovable.dev)
-
-*Replace the link above with your published Lovable project URL when you share this README.*
-
-### Retro products, modern storefront
-
-The **catalog leans 1990s** in theme, which lands as **retro** in tone. The **chrome around it is intentionally contemporary**: **rounded corners**, lots of **whitespace**, and a **clean** structure so **3D product imagery** stays the hero. The mix—nostalgic items inside a current, minimal shell—keeps the brand playful without feeling like a dated interface.
-
-### Reducing friction
-
-The UX favors **simplicity**: short decision paths per screen, predictable navigation (see [Features implemented](#features-implemented)), and familiar cart/checkout patterns so attention stays on products, not on learning a novel UI.
-
-### Type, radii, and color
-
-**Typography, border radii, and palette** support the same story: **soft, approachable surfaces**, **neutral bases** so renders and thumbnails read clearly, and a **single accent system** for actions and focus—implemented as Tailwind tokens and shared components ([Tech stack](#tech-stack--engineering-decisions), [ADR 0002](docs/adr/0002-tailwind-css.md)). For how that shows up for keyboard and screen-reader users, see [Accessibility](#accessibility).
+| Topic              | Decision                                      | ADR   |
+| ------------------ | --------------------------------------------- | ----- |
+| Route lazy loading | Home eager; rest lazy + `Suspense`            | [0003](docs/adr/0003-route-lazy-loading.md) |
+| Cart               | Zustand + `persist`                           | [0001](docs/adr/0001-zustand-cart-store.md) |
+| Styling            | Tailwind + components                         | [0002](docs/adr/0002-tailwind-css.md)       |
+| Lists / images / Vitals | memo, lazy images, web-vitals            | [0004](docs/adr/0004-frontend-performance-baseline.md) |
+| Layout             | Features + `shared`                           | [0010](docs/adr/0010-feature-based-architecture.md) |
 
 ---
 
-## Testing strategy
+## Conventions, commits, and maintainability
 
-**Problem:** The brief rewards both **correct behavior** and **maintainable tests**; brittle tests that depend on implementation details break on every refactor.
+This section brings together **Git discipline**, **automation**, and **architecture choices** aimed at **readable, consistent, easy-to-evolve code** — the same reasoning that supports *clean code*, clear reviews, and team scalability (human or with AI).
 
-**Decisions**
+### Commits: [Conventional Commits](https://www.conventionalcommits.org/) + Commitlint
 
-1. **MSW** defines the HTTP contract once; the same handlers run in browser (dev) and Jest, so tests assert what users see after “network” responses, not mocked implementation details of `axios` internals.
-2. **Testing Library** queries (`getByRole`, `findBy*`) keep assertions aligned with accessibility and real DOM output.
-3. **Layers:** unit tests for pure functions (e.g. `formatCurrency`); component tests for isolated widgets; integration tests that render `App` or full pages with `MemoryRouter` + `QueryClientProvider` for navigation and cart flows.
-4. **Shared test utilities** under `src/config/test/` to avoid copy-pasting providers and wrappers—test code is still code.
+- **Format:** `type(optional scope): description` with the **type** in lowercase; the **description** uses the imperative (*add*, *fix*, *update*, not *added* / *fixes*); body and footer are optional (e.g. issue reference, `BREAKING CHANGE:`).
+- **Commitlint** ([`commitlint.config.js`](commitlint.config.js)) uses **`@commitlint/config-conventional`**, which accepts **only** the types in the table below (messages outside that set fail the hook). This keeps history **aligned with automated changelogs** and easy to filter.
 
-There is no dedicated ADR for testing; the approach follows the same principle as the ADRs: **explicit trade-offs** (MSW setup cost vs. flaky real-network tests; integration runtime vs. confidence). UI and flow expectations align with [Design process & UI direction](#design-process--ui-direction) and [Features implemented](#features-implemented).
+| Type | When to use | Example subject |
+|------|-------------|-----------------|
+| **`feat`** | New **user-visible** functionality or integration (typically *minor* in SemVer). | `feat(product): add related products` |
+| **`fix`** | **Bug fix** or incorrect behavior (patch). | `fix(cart): correct total when removing last item` |
+| **`docs`** | **Documentation only** (README, ADRs, relevant JSDoc, doc copy — no production logic). | `docs: describe commit types in README` |
+| **`style`** | Code **formatting / style** without behavior change (whitespace, semicolons). *Not* UI CSS — source style here. | `style: apply prettier to cart tests` |
+| **`refactor`** | **Restructure** code (rename, extract, move files) **without** fixing a bug or adding a feature. | `refactor(checkout): extract address validation` |
+| **`perf`** | Measurable **performance** improvement (fewer re-renders, bundle, response time). | `perf(home): memoize product grid item` |
+| **`test`** | Add, fix, or refactor **tests** (unit, integration, mocks) without changing production code. | `test(msw): cover 500 on products` |
+| **`build`** | **Build** or packaging tooling: Webpack/CRACO, `package.json`, bundle dependency resolution. | `build: bump craco minor` |
+| **`ci`** | **CI/CD** config (GitHub Actions, Vercel config only, pipeline scripts). | `ci: add lint job to workflow` |
+| **`chore`** | **Maintenance** that does not fit elsewhere: internal tasks, devDependency bumps without direct feature/fix impact, script cleanup. | `chore: bump eslint version` |
+| **`revert`** | **Revert** a previous commit (often with body `Reverts hash…`). | `revert: feat(cart): new store API` |
+
+**Quick examples with scope:** `feat(cart): persist items in localStorage`, `fix(checkout): validate empty zip`, `docs(adr): record deploy decision`.
+
+**Tip:** if unsure between `chore` and `fix`/`feat`, ask *“does this change user-visible behavior or fix a bug?”* — if yes, it is not `chore`.
+
+**Validate manually (useful in CI or before opening a PR):**
+
+```bash
+echo "feat: example message" | npx commitlint
+```
+
+### Husky: commit message and checks before push
+
+- **[Husky](https://typicode.github.io/husky/)** registers Git hooks in [`.husky/`](.husky/).
+- The **[`commit-msg`](.husky/commit-msg)** hook runs Commitlint on the commit message — **you do not have to memorize the format** if Git warns you on failure.
+- The **[`pre-push`](.husky/pre-push)** hook runs **`npm run lint`** and **`npm run test:ci`** (Jest **without** *watch* mode, via `CI=true` in the script) — push proceeds only if both pass.
+- The **`prepare`** script in [`package.json`](package.json) (`husky`) runs after `npm install` so fresh clones **get hooks installed** without extra manual steps.
+- **Note:** there is no `pre-commit` hook; you can add *lint-staged* on `pre-commit` to validate only changed files before each commit.
+
+### ESLint + Prettier: style and common mistakes
+
+- **ESLint** (`npm run lint`) with **react-app** config (+ Jest), aligned with the CRA ecosystem.
+- **Prettier** (`npm run format`) with **eslint-config-prettier** / **eslint-plugin-prettier** for **one source of truth** between formatting and rules — less debate in PRs and cleaner diffs.
+- Running **lint** (and formatting when appropriate) **before push** reduces noise and keeps code **predictable** for readers and refactors.
+
+### Granularity, composition, and feature separation
+
+- **`src/pages`:** thin layer that **composes** features and layout per route — avoids “god pages” with all logic.
+- **`src/features/*`:** each flow (home, product, cart, checkout) holds UI and rules for that domain — **localized changes** and clear mental ownership.
+- **`src/shared`:** only **truly cross-cutting** pieces (components, `httpClient`, stores, utils, shared types).
+- **Composition:** small reusable components (cards, steppers, buttons) instead of monolithic blocks — easier tests, `memo` where it matters, linear reading.
+- **ADR** [0010](docs/adr/0010-feature-based-architecture.md) documents this layout.
+
+### TypeScript, contracts, and tests as a safety net
+
+- **TypeScript** at boundaries (API, store, props) **documents intent** and enables confident refactors — a maintainability pillar.
+- **MSW** with the **same handlers** in dev and Jest **fixes the HTTP contract** in one place ([ADR 0005](docs/adr/0005-msw-api-mocking.md)) — less drift between environments.
+- **Testing Library** + **`customRender`** with shared providers avoids copying boilerplate and keeps tests **readable and stable**.
+
+### ADRs and deploy (context for decisions)
+
+- **[ADRs](docs/adr/)** record **context → decision → trade-off** (Query, Zustand, Tailwind, Vercel, etc.), which **scales knowledge** as the project grows or changes hands.
+- **Vercel deploy** ([ADR 0011](docs/adr/0011-vercel-deployment.md)) keeps **CI/CD simple** and predictable; aligns with continuous delivery practices for this MVP.
+
+### “Vercel React Best Practices” skill (AI and review)
+
+The repo includes the skill **[`.agents/skills/vercel-react-best-practices/`](.agents/skills/vercel-react-best-practices/SKILL.md)** (Vercel engineering guidance for **React / performance**). Use it as a **checklist** when writing or reviewing code with AI assistants: re-renders, bundle, data patterns — it **complements** ESLint/Prettier (different rule sets) and reinforces **consistency** on performance and component architecture.
+
+### Summary: day-to-day conventions
+
+1. **Commits** in conventional format (the hook helps).
+2. **`npm run lint`** and **`npm run format`** before integrating code.
+3. **Put code in the right place** (feature vs. `shared`) and **compose** instead of inflating a single file.
+4. **Document meaningful decisions** in an ADR when there is a trade-off.
+5. Use **types + MSW + tests** so contracts do not regress silently.
+
+---
+
+## Design, UX/UI, and Lovable prototyping
+
+With a **UX/UI** background, I use **[Lovable](https://lovable.dev)** to **explore layout and flow** (hero, search, tags, grid) in short cycles before locking tokens and components in the repo. The preview is a **reference for intent**; final code (TypeScript, features, tests, MSW) is where accessibility rigor, types, and the HTTP contract land.
+
+**Preview:** [https://id-preview--6fba5f6d-406b-42c1-be21-a87c0e1549aa.lovable.app/](https://id-preview--6fba5f6d-406b-42c1-be21-a87c0e1549aa.lovable.app/)
+
+---
+
+## Practices in this version: conventions and AI
+
+- **TypeScript strict, ESLint, Prettier, feature structure, ADRs, conventional commits (Commitlint + Husky)** — see [Conventions, commits, and maintainability](#conventions-commits-and-maintainability).
+- **AI (Lovable, editor):** speeds exploration and boilerplate; **human review** on types, a11y, and business rules; tests and lint as a safety net; the **Vercel React Best Practices** skill in [`.agents/skills/vercel-react-best-practices/`](.agents/skills/vercel-react-best-practices/SKILL.md) supports performance-focused React reviews.
+
+---
+
+## Future improvements (real product)
+
+Ideas beyond the MVP — **not** a roadmap commitment.
+
+### SEO and HTML
+
+- **SSR/SSG** (Next.js, Remix) for HTML with content in the first byte.
+- **Dynamic sitemap** generated from the API when the catalog is large or multilingual.
+- **`hreflang`** and metadata per language when adding **i18n**.
+
+### Internationalization (i18n)
+
+- Libraries like **react-i18next** / Lingui, locale routes, currency/date formatting.
+
+### Data, API, and reliability
+
+- **Real production API** (replace mocks): the browser talks to a real backend; align contracts with current MSW handlers or evolve them until mocks are removed.
+- **MSW only in development and tests:** in this MVP `initMocks()` may also run in production (Vercel demo). In a real product, **do not** initialize MSW in production — conditional import or only under `NODE_ENV === 'development'` / test pipeline — so **MSW, handlers, and `mockServiceWorker.js` stop contributing to the bundle** and runtime (less JS, less risk of accidentally intercepting real traffic).
+- Cart synced with an **authenticated** user; **Sentry** (or similar) on the Error Boundary; send **web-vitals** in production.
+
+### Payments and compliance
+
+- Real gateway (PCI with the provider); CSP and LGPD/GDPR review.
+
+### Performance and scale
+
+- CDN, `srcset`, list virtualization, pagination/infinite query on the API, optional PWA.
+
+### Quality and DX
+
+- **E2E** (Playwright/Cypress); **Storybook** for `shared`.
 
 ---
 
 ## Original brief
 
-> The goal of this task is to test your ability to test, refactor and implement new functionality on a given system. Note that this repository does not represent the actual code of CGTrader, but only acts as a testing ground.
+> The goal of this task is to test your ability to test, refactor, and implement new functionality in a given system. Note that this repository does not represent CGTrader’s real code — it is only a test field.
 
 **Tasks**
 
 1. Implement MVP cart functionality  
-2. Refactor implementation code and tests where you see fit  
-3. Take UI and UX into consideration; improve layout and styles  
-4. Make sure the test suite runs through all tests successfully  
+2. Refactor implementation and tests where appropriate  
+3. Consider UI and UX; improve layout and styles  
+4. Ensure the full test suite runs successfully  
 
-**Notes:** Use git to track changes; submit a link or zip when finished.
+**Notes:** use git to track changes.
 
 ---
 
-## Architecture Decision Records
+## ADRs (Architecture Decision Records)
+
+All records live in [`docs/adr/`](docs/adr/). Titles below match each document.
 
 - [ADR 0001: Use Zustand for cart store](docs/adr/0001-zustand-cart-store.md)
 - [ADR 0002: Use Tailwind CSS as primary styling approach](docs/adr/0002-tailwind-css.md)
 - [ADR 0003: Route-level lazy loading with Home as eager entrypoint](docs/adr/0003-route-lazy-loading.md)
 - [ADR 0004: Frontend performance baseline for marketplace flows](docs/adr/0004-frontend-performance-baseline.md)
+- [ADR 0005: Use MSW for API mocking (development + Jest)](docs/adr/0005-msw-api-mocking.md)
+- [ADR 0006: Use TanStack React Query for server-derived data](docs/adr/0006-tanstack-react-query.md)
+- [ADR 0007: Use Axios as the HTTP client (vs. native `fetch`)](docs/adr/0007-axios-http-client.md)
+- [ADR 0008: Use React Hook Form for checkout](docs/adr/0008-react-hook-form-checkout.md)
+- [ADR 0009: SEO in a CRA SPA with react-helmet-async](docs/adr/0009-seo-react-helmet-async-spa.md)
+- [ADR 0010: Feature-based architecture with a `shared` layer](docs/adr/0010-feature-based-architecture.md)
+- [ADR 0011: Host the MVP on Vercel](docs/adr/0011-vercel-deployment.md)
 
 ---
 
 ## Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app). For more detail on CRA defaults, see the [CRA documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app). **CRACO** only replaces the direct `react-scripts` invocation in npm scripts; see [CRACO and bundle analysis](#craco-and-bundle-analysis). More detail in the [CRA docs](https://facebook.github.io/create-react-app/docs/getting-started).
 
 ---
 
-*Built as a **frontend** technical submission for **CGTrader**. This repo is a self-contained exercise: it is **not** production CGTrader software, and mocked data stands in for a real marketplace API.*
+*Built as a **frontend deliverable** for assessment (**CGTrader**). This repository is a self-contained exercise: it is **not** CGTrader production software; data and API are mocked in place of a real marketplace.*
