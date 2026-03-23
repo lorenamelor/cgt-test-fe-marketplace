@@ -1,8 +1,8 @@
 import { memo } from 'react';
-import type { Product } from '../../../shared/types/product';
-import { formatCurrency } from '../../../shared/utils/formatCurrency';
-import { QuantityStepper } from '../../../shared/components/quantityStepper';
-import { ReactComponent as TrashIcon } from '../../../shared/assets/trash.svg';
+import type { Product } from '../../../../shared/types/product';
+import { formatCurrency } from '../../../../shared/utils/formatCurrency';
+import { QuantityStepper } from '../../../../shared/components/quantityStepper';
+import { ReactComponent as TrashIcon } from '../../../../shared/assets/trash.svg';
 
 type CartItemProps = {
   product: Product;

@@ -1,8 +1,8 @@
-import { useCartStore } from '../../../shared/stores/cart';
-import { products } from '../../../shared/mocks';
-import { CartItemsList } from './cartItemsList';
-import { OrderSummary } from './orderSummary';
-import { CartEmptyState } from './cartEmptyState';
+import { useCartStore } from '../../../../shared/stores/cart';
+import { products } from '../../../../shared/mocks';
+import { CartItemsList } from '../cartItemsList';
+import { OrderSummary } from '../orderSummary';
+import { CartEmptyState } from '../cartEmptyState';
 
 export function CartPageSection() {
   const items = useCartStore((s) => s.items);

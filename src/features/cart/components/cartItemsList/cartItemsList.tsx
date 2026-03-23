@@ -1,7 +1,7 @@
-import type { Product } from '../../../shared/types/product';
-import type { CartItem } from '../../../shared/stores/cart';
-import { products as mockProducts } from '../../../shared/mocks';
-import { CartItem as CartItemRow } from './cartItem';
+import type { Product } from '../../../../shared/types/product';
+import type { CartItem } from '../../../../shared/stores/cart';
+import { products as mockProducts } from '../../../../shared/mocks';
+import { CartItem as CartItemRow } from '../cartItem/cartItem';
 
 type CartItemsListProps = {
   items: CartItem[];

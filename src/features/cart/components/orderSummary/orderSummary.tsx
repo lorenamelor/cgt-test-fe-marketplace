@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { formatCurrency } from '../../../shared/utils/formatCurrency';
+import { formatCurrency } from '../../../../shared/utils/formatCurrency';
 
 type OrderSummaryProps = {
   subtotalCents: number;

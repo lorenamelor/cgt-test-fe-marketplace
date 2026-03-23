@@ -1,5 +1,5 @@
-import { useCartStore } from '../../../shared/stores/cart';
-import { ReactComponent as TrashIcon } from '../../../shared/assets/trash.svg';
+import { useCartStore } from '../../../../shared/stores/cart';
+import { ReactComponent as TrashIcon } from '../../../../shared/assets/trash.svg';
 
 export function ClearCartButton() {
   const clearCart = useCartStore((s) => s.clearCart);
