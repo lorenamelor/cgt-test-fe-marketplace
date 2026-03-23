@@ -27,6 +27,8 @@ We use **TanStack React Query** (`@tanstack/react-query`) for product data from 
 
 Components use `useQuery` (and related hooks) with the existing Axios product service.
 
+**Mutations:** checkout order placement uses **`useMutation`** via **`useCreateOrder`**, calling **`createOrder`** (`POST /api/orders`). That reuses the same **QueryClient** and keeps **pending / error** state for submit in one place, separate from React Hook Form field state.
+
 ## Alternatives considered
 
 **`useEffect` + `useState` + manual `fetch` / Axios**
@@ -51,7 +53,7 @@ Components use `useQuery` (and related hooks) with the existing Axios product se
 
 ## Trade-offs
 
-- Server state is split: **React Query** for remote product data, **Zustand** for cart. That is on purpose: different lifecycles and persistence.
+- Server state is split: **React Query** for remote product data **and** the checkout **mutation**, **Zustand** for cart. That is on purpose: different lifecycles and persistence.
 
 ## References
 

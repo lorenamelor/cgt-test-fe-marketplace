@@ -14,11 +14,13 @@ The product service calls HTTP with a configurable base URL. We want a small lay
 
 ## Decision
 
-We use **Axios** through one shared instance (see `src/shared/services/httpClient`):
+We use **Axios** through a single shared instance **`fetcher`** (`src/shared/services/fetcher.ts`), also exported as **`httpClient`** for existing imports:
 
-- **`baseURL`** from env or config so MSW and future backends swap easily.
-- Optional **interceptors** for errors or auth as the app grows.
-- Services (e.g. product API) return typed data; components and React Query use those functions.
+- **`baseURL`** `/api` and **timeout** so MSW and future backends swap easily.
+- **Request / response interceptors** map failures to a shared **`ApiError`** (`axiosErrorHandlers.ts`); UI uses **`getApiErrorMessage`** where needed.
+- Services return typed data; components and React Query call those functions.
+
+**Jest + MSW note:** the default XHR adapter can return an **empty response body** in tests. The shared **`fetcher`** therefore sets **`adapter: axiosFetchAdapter`** by default (`fetch` under the hood) so all calls keep interceptors and typed `AxiosError` / **`ApiError`** while response bodies are read reliably.
 
 ## Alternatives considered
 

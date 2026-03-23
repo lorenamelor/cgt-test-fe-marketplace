@@ -19,7 +19,7 @@ We use **React Hook Form** on the checkout page:
 
 - **`useForm`** with **`FormProvider`** so nested fields can use `useFormContext` where it helps.
 - **`mode: 'onSubmit'`** so validation runs when the user tries to finish the purchase, not on every keypress unless we change that later.
-- Default values set once; submit handler ties into navigation and clearing the cart.
+- Default values set once; the submit handler builds a **`CreateOrderPayload`** (form values + **cart line items** from Zustand) and calls **`useCreateOrder`**, a **TanStack React Query** `useMutation` that invokes **`createOrder`** via the shared Axios **`fetcher`** (`POST /api/orders`, mocked by MSW). On success: **clear the cart**, **navigate** to `/complete?order=…` with the returned **order number**; on failure, **`getApiErrorMessage`** maps **`ApiError`** from response interceptors to UI text.
 
 ## Alternatives considered
 
@@ -41,6 +41,7 @@ We use **React Hook Form** on the checkout page:
 ## Trade-offs
 
 - Cart stays in **Zustand**; checkout **field values** stay in RHF until submit. That keeps cart logic separate from short-lived form state.
+- **Mutation state** (pending, error) lives in React Query on the checkout page, separate from RHF’s field state — avoids mixing async order placement with input registration.
 
 ## References
 

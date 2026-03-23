@@ -6,7 +6,7 @@ Accepted
 
 ## Context
 
-The MVP has no real backend. The app still calls HTTP endpoints (via Axios) as if a server existed. We need:
+The MVP has no real backend. The app still calls HTTP endpoints (Axios for catalog, **`fetch` for `POST /api/orders`** — see ADR 0007) as if a server existed. We need:
 
 - The **same API shape** in local dev and in tests.
 - Tests that check **what the user sees** after a response, not fragile mocks of `axios` or `fetch` in every file.
@@ -19,7 +19,7 @@ We use **[Mock Service Worker (MSW)](https://mswjs.io/)** to intercept HTTP:
 - **Browser (dev):** a service worker runs handlers from `src/mocks` so the app uses the real client code with fake responses.
 - **Jest:** `setupTests` starts MSW’s `server` with the same handlers so tests use the same routes and payloads.
 
-Product handlers (e.g. `GET /api/products`, `GET /api/products/:id`) sit next to shared mock data so dev and CI match.
+Product and order handlers (e.g. `GET /api/products`, `GET /api/products/:id`, related products, **`POST /api/orders`** returning `{ orderNumber }` or validation errors) sit next to shared mock data so dev and CI match.
 
 ## Alternatives considered
 
