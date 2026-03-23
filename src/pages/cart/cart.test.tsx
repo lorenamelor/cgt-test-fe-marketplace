@@ -38,4 +38,17 @@ describe('Cart page - integration', () => {
     expect(orderSummaryScope.getByText('Total')).toBeInTheDocument();
     expect(orderSummaryScope.getByText('$138.99')).toBeInTheDocument();
   });
+
+  it('should clear all items when Clear Cart is clicked', async () => {
+    render(<App />);
+
+    await userEvent.click(screen.getByRole('link', { name: /open cart/i }));
+    expect(await screen.findByRole('heading', { name: /shopping cart/i })).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: /clear cart/i }));
+
+    expect(useCartStore.getState().items).toEqual([]);
+    expect(await screen.findByText(/your cart is empty/i)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /clear cart/i })).not.toBeInTheDocument();
+  });
 });

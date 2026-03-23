@@ -23,16 +23,20 @@ export function CartPageSection() {
   }
 
   return (
-    <div className="mt-6 grid gap-8 md:mt-8 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] md:items-start">
-      <CartItemsList
-        items={items}
-        onIncrement={(id) => addItem(id, 1)}
-        onDecrement={(id) =>
-          setQuantity(id, Math.max(0, (items.find((i) => i.productId === id)?.quantity ?? 1) - 1))
-        }
-        onRemove={removeItem}
-      />
-      <OrderSummary subtotalCents={subtotalCents} itemCount={itemCount} />
+    <div className="mt-6 grid min-w-0 gap-8 md:mt-8 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] md:items-start">
+      <div className="min-w-0">
+        <CartItemsList
+          items={items}
+          onIncrement={(id) => addItem(id, 1)}
+          onDecrement={(id) =>
+            setQuantity(id, Math.max(0, (items.find((i) => i.productId === id)?.quantity ?? 1) - 1))
+          }
+          onRemove={removeItem}
+        />
+      </div>
+      <div className="min-w-0">
+        <OrderSummary subtotalCents={subtotalCents} itemCount={itemCount} />
+      </div>
     </div>
   );
 }
