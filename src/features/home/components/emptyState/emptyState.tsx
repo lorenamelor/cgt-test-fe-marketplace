@@ -9,7 +9,11 @@ export function EmptyState({ searchTerm }: EmptyStateProps) {
     : 'No products available right now.';
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-600">
+    <div
+      role="status"
+      aria-live="polite"
+      className="rounded-2xl border border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-600"
+    >
       {emptyMessage}
     </div>
   );

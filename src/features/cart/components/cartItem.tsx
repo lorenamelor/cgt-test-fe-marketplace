@@ -20,9 +20,9 @@ function CartItemComponent({
   onRemove,
 }: CartItemProps) {
   return (
-    <article className="flex items-center justify-between gap-6 rounded-3xl bg-white px-6 py-5 shadow-[0_18px_40px_rgba(15,23,42,0.08)]">
-      <div className="flex items-center gap-4">
-        <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl bg-slate-50">
+    <article className="flex min-w-0 flex-col rounded-3xl bg-white px-4 py-5 shadow-[0_18px_40px_rgba(15,23,42,0.08)] min-[900px]:flex-row min-[900px]:items-center min-[900px]:justify-between min-[900px]:gap-6 min-[900px]:px-6">
+      <div className="flex min-w-0 flex-1 items-center gap-4">
+        <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-slate-50">
           <img
             src={product.imageUrl}
             alt={product.name}
@@ -31,22 +31,30 @@ function CartItemComponent({
           />
         </div>
 
-        <div>
-          <h3 className="text-sm font-semibold text-slate-900 md:text-base">{product.name}</h3>
-          <p className="mt-1 text-xs text-slate-400 md:text-sm">RetroGameVault</p>
-          <p className="mt-1 text-sm font-semibold text-primary md:text-base">
+        <div className="min-w-0 flex-1">
+          <h3 className="break-words text-sm font-semibold text-slate-900 min-[900px]:text-base">
+            {product.name}
+          </h3>
+          <p className="mt-1 text-xs text-slate-500 min-[900px]:text-sm">RetroGameVault</p>
+          <p className="mt-1 text-sm font-semibold text-primary min-[900px]:text-base">
             {formatCurrency(product.priceCents)}
           </p>
         </div>
       </div>
 
-      <div className="flex items-center gap-6">
+      <div
+        className="my-4 border-t border-slate-100 min-[900px]:hidden"
+        role="presentation"
+        aria-hidden
+      />
+
+      <div className="flex min-w-0 w-full items-center justify-between gap-4 min-[900px]:w-auto min-[900px]:shrink-0 min-[900px]:justify-end min-[900px]:gap-6">
         <QuantityStepper quantity={quantity} onDecrement={onDecrement} onIncrement={onIncrement} />
 
         <button
           type="button"
           aria-label="Remove item"
-          className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-400 hover:bg-slate-50"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200 text-slate-400 transition hover:bg-slate-50"
           onClick={onRemove}
         >
           <TrashIcon className="h-4 w-4" aria-hidden />

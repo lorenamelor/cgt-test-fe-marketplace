@@ -13,6 +13,7 @@ type TrendingProductsProps = {
 
 export function TrendingProducts({ searchTerm, selectedTag }: TrendingProductsProps) {
   const debouncedSearch = useDebouncer(searchTerm, SEARCH_DEBOUNCE_MS);
+  const isSearchDebouncing = searchTerm.trim() !== debouncedSearch.trim();
 
   const {
     data: products,
@@ -29,16 +30,17 @@ export function TrendingProducts({ searchTerm, selectedTag }: TrendingProductsPr
   return (
     <section className="mt-16 md:mt-20">
       <TrendingProductsHeader
-        isPending={isPending}
+        isPending={isPending || isSearchDebouncing}
         isError={isError}
         totalProducts={totalProducts}
       />
       <TrendingProductsGrid
         isPending={isPending}
+        isSearchDebouncing={isSearchDebouncing}
         isError={isError}
         isRetrying={isRefetching}
         products={products ?? []}
-        searchTerm={searchTerm}
+        debouncedSearch={debouncedSearch}
         onRetry={() => {
           void refetch();
         }}

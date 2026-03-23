@@ -11,23 +11,25 @@ const SKELETON_CARDS_COUNT = 4;
 type TrendingProductsGridProps = {
   products: Product[];
   isPending: boolean;
+  isSearchDebouncing: boolean;
   isError: boolean;
   isRetrying: boolean;
   onRetry: () => void;
-  searchTerm: string;
+  debouncedSearch: string;
 };
 
 export function TrendingProductsGrid({
   products,
   isPending,
+  isSearchDebouncing,
   isError,
   isRetrying,
   onRetry,
-  searchTerm,
+  debouncedSearch,
 }: TrendingProductsGridProps) {
   const addItem = useCartStore((s) => s.addItem);
 
-  if (isPending) {
+  if (isPending || isSearchDebouncing) {
     return (
       <div className={GRID_CLASS}>
         {Array.from({ length: SKELETON_CARDS_COUNT }).map((_, idx) => (
@@ -48,7 +50,7 @@ export function TrendingProductsGrid({
   }
 
   if (products.length === 0) {
-    return <EmptyState searchTerm={searchTerm} />;
+    return <EmptyState searchTerm={debouncedSearch} />;
   }
 
   return (
