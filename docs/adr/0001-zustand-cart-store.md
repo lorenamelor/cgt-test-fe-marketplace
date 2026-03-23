@@ -6,32 +6,32 @@ Accepted
 
 ## Context
 
-The application needs client-side state for the shopping cart: list of items (product id + quantity), add/remove/update actions, and the ability to clear the cart. This state is shared across multiple parts of the UI (header badge, cart page, product page “Add to cart”, checkout). We need a predictable, maintainable solution that fits a small team and avoids unnecessary re-renders.
+The app needs client-side state for the shopping cart: items (product id + quantity), add/remove/update, and clear. This state is used in several places (header badge, cart page, product page, checkout). We want a simple solution that fits a small team and avoids extra re-renders.
 
 ## Decision
 
-We use **Zustand** as the state library for the cart store (`src/shared/stores/cart`).
+We use **Zustand** for the cart store (`src/shared/stores/cart`).
 
-- The store holds `items: CartItem[]` and exposes actions: `addItem`, `removeItem`, `setQuantity`, `clearCart`.
-- Components subscribe only to the slices they need (e.g. `useCartStore((s) => s.items)` or selectors) to keep re-renders minimal.
-- **Persistence:** The cart uses Zustand’s **`persist`** middleware with **`localStorage`**, so we did not hand-roll sync (`useEffect`, JSON, hydration). The same store the UI reads is what gets saved; we **`partialize`** to persist only `items`. That ease of persistence was an intentional part of choosing Zustand.
+- The store holds `items: CartItem[]` and exposes: `addItem`, `removeItem`, `setQuantity`, `clearCart`.
+- Components only subscribe to what they need (e.g. `useCartStore((s) => s.items)` or selectors) to limit re-renders.
+- **Persistence:** We use Zustand’s **`persist`** middleware with **`localStorage`**, so we do not write our own sync (`useEffect`, JSON, hydration). The UI reads the same store that gets saved. We use **`partialize`** to save only `items`. Easy persistence was one reason we picked Zustand.
 
 ## Alternatives considered
 
 **React Context + useReducer**
 
-- Pros: No extra dependency, built-in.
-- Cons: Cart updates would propagate via context and tend to cause broad re-renders unless we split contexts and manually optimize.
+- Pros: Built-in, no extra package.
+- Cons: Cart updates go through context and often cause wide re-renders unless we split contexts and optimize by hand.
 
 **Zustand**
 
-- Pros: Small API, minimal boilerplate, selective subscriptions to limit re-renders; lightweight; works outside React if needed; **official `persist` middleware** for `localStorage` / custom storage without duplicating sync logic.
-- Cons: Extra dependency; team convention needed for store shape and selectors; no built-in devtools (middleware can be added).
+- Pros: Small API, little boilerplate, selective subscriptions; light; works outside React if needed; **official `persist` middleware** for `localStorage` without duplicating sync logic.
+- Cons: Extra dependency; team needs agreed patterns for store shape and selectors; no built-in devtools (middleware can add them).
 
-**Ad-hoc `localStorage` + React state (Context or otherwise)**
+**Ad-hoc `localStorage` + React state (Context or other)**
 
 - Pros: No middleware to learn.
-- Cons: Easy to drift from in-memory state; manual hydration, error handling, and migrations; more code and tests to maintain for the same outcome.
+- Cons: Easy to get out of sync with in-memory state; manual hydration, errors, and migrations; more code for the same result.
 
 ## References
 

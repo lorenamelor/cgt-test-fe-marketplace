@@ -6,13 +6,13 @@ Accepted
 
 ## Context
 
-The application uses React Router with a storefront flow where users usually start at Home and then navigate to Product, Cart, Checkout, and Complete.
+The app uses React Router. Users usually start on Home, then go to Product, Cart, Checkout, and Complete.
 
-We want to improve initial load performance without adding unnecessary friction in the most critical first interaction.
+We want a faster first load without hurting the first screen users see.
 
 ## Decision
 
-We apply route-level code splitting with this policy:
+We split code by route like this:
 
 - `Home` (`/`) is **eager** (not lazy).
 - `Product` (`/products/:productId`) is **lazy**.
@@ -22,35 +22,34 @@ We apply route-level code splitting with this policy:
 
 ## Why Home is not lazy
 
-Home is the landing page and first meaningful screen for most sessions. Keeping Home eager avoids an extra async boundary on first paint and reduces the chance of a fallback state during the initial interaction.
+Home is the first screen for most visits. Loading Home eagerly avoids an extra async step on first paint and reduces loading spinners on the first view.
 
-In practical terms, this improves perceived performance where it matters most:
+In practice:
 
-- faster first content impression;
-- fewer loading transitions before users see products;
-- lower risk of conversion impact on the first step of the funnel.
+- faster first content;
+- fewer loading states before users see products;
+- less risk on the first step of the funnel.
 
 ## Why the other routes are lazy
 
-Product, Cart, Checkout, and Complete are navigated after user interaction. Loading them lazily keeps the initial bundle smaller while preserving a responsive first render on Home.
+Product, Cart, Checkout, and Complete load after the user navigates. Lazy loading keeps the first bundle smaller while Home still renders quickly.
 
-This is a better trade-off for this flow than making all routes eager.
+For this flow, that trade-off is better than loading every route up front.
 
 ## Web Vitals impact
 
-The chosen split strategy is expected to impact Core Web Vitals as follows:
+We expect:
 
-- **LCP (Largest Contentful Paint)**: keeping `Home` eager reduces the chance of delaying first meaningful content on the landing route.
-- **INP (Interaction to Next Paint)**: a smaller initial JavaScript bundle lowers main-thread pressure during startup, which can improve early interaction responsiveness.
+- **LCP (Largest Contentful Paint):** eager `Home` lowers the chance of delaying the first meaningful content on `/`.
+- **INP (Interaction to Next Paint):** a smaller first JS bundle means less main-thread work at startup, which can help early clicks and taps.
 
 ## Consequences
 
 - **Positive**
-  - Smaller initial JavaScript payload.
-  - Better startup performance focus on landing page.
-  - Clear and predictable routing performance policy.
+  - Smaller first JavaScript load.
+  - Focus on landing page performance.
+  - Clear routing policy.
 
 - **Negative**
-  - Secondary route transition may show a short fallback if chunk is not cached.
-  - Requires keeping route boundaries and fallbacks consistent during refactors.
-
+  - Other routes may briefly show a fallback if the chunk is not cached yet.
+  - Refactors must keep route boundaries and fallbacks consistent.
