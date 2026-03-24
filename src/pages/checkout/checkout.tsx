@@ -31,6 +31,8 @@ export function Checkout() {
   });
 
   const onSubmit = (_data: CheckoutFormValues) => {
+    // TODO(checkout): Integrate with POST /api/orders to send the form payload and use the API’s
+    // orderNumber in navigation instead of generating it only on the client.
     const orderNumber = generateOrderNumber();
     clearCart();
     navigate(`/complete?order=${orderNumber}`);

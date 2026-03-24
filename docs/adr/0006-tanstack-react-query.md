@@ -6,54 +6,51 @@ Accepted
 
 ## Context
 
-Product list and product detail load data over the network. Without a shared layer, each screen often repeats:
+Product list and product detail load data from the API. Doing that only with `useState`, `useEffect`, and Axios tends to repeat the same problems on every screen:
 
-- Loading, error, and success with `useState` + `useEffect`.
-- **Extra state** just to hold fetched payloads and to keep loading/error flags in sync—easy to get wrong (e.g. stale errors, double fetches, forgotten resets).
-- **Duplicate requests** when the same data is needed in more than one place.
-- **Stale UI** when returning to a screen that already loaded data.
+- **Boilerplate:** loading, error, and success flags plus the fetched payload, all kept in sync by hand—easy to leave stale errors, double-fetch, or forget to reset.
+- **Duplicate work:** the same endpoint may be called from more than one place with no shared cache.
+- **Stale screens:** navigating back to a page that already loaded data often refetches or shows empty state until effects run again.
 
-We want caching, deduplication, and one place to set refetch rules (`staleTime`, `gcTime`) as the app grows. We also want **less hand-rolled async state**: one hook should expose status, cached data, and refetch without a parallel `useState` tree.
+We need a single pattern for **server state**: cache, deduplication, and predictable refetch rules. Client-only concerns (UI toggles, cart) stay elsewhere (see ADR 0001).
 
 ## Decision
 
-We use **TanStack React Query** (`@tanstack/react-query`) for product data from the server:
+We use **TanStack React Query** (`@tanstack/react-query`) for **remote catalog data** (`useQuery` on product list, detail, and related products). Any future **server write** (e.g. placing an order via API) should use **`useMutation`** so **pending / error** stay with the request instead of duplicating that logic in effects or scattered `useState`.
 
-- A shared **`QueryClient`** wraps the app (see `App` / providers).
-- **Stable query keys** live under `src/config/query/` (e.g. products list, product by id) so invalidation stays clear.
-- **`staleTime` / `gcTime`** are set on purpose to limit useless refetches on navigation while still allowing refresh when needed.
-- **Status and data from the library:** `useQuery` exposes flags such as `isPending`, `isError`, and `isSuccess`, plus the **`data`** already tied to the cache—no separate `useState` for “the result” or for each phase. **`refetch`** is a single callable instead of re-running manual effect logic.
-- **Simpler UI code:** screens branch on those flags and render `data` when ready; implementation stays smaller and easier to reason about than custom `useEffect` + multiple `setState` calls.
+| Topic | What we do |
+| --- | --- |
+| **Setup** | One shared **`QueryClient`** at the app root (see `App` / providers). |
+| **Keys** | Central definitions under `src/config/query/` so list vs detail vs invalidation stay obvious. |
+| **Freshness** | **`staleTime`** and **`gcTime`** set intentionally so navigation does not spam refetches, but data can still refresh when we need it. |
+| **Reads** | **`useQuery`** exposes **`isPending` / `isError` / `isSuccess`**, cached **`data`**, and **`refetch`**—screens branch on those flags instead of hand-rolling loading/error/success state per page. |
+| **Writes** | Prefer **`useMutation`** for POST/PUT/PATCH to the API; keep React Hook Form (or similar) for field values only, not for mimicking network status. |
 
-Components use `useQuery` (and related hooks) with the existing Axios product service.
+**Integration:** queries call the existing Axios product helpers; React Query wraps those calls—it does not replace the service layer.
 
-**Mutations:** checkout order placement uses **`useMutation`** via **`useCreateOrder`**, calling **`createOrder`** (`POST /api/orders`). That reuses the same **QueryClient** and keeps **pending / error** state for submit in one place, separate from React Hook Form field state.
+**Why this library:** strong defaults for cache and deduplication, first-class **query keys**, and a clear line between **server state** (React Query) and **client state** (e.g. Zustand cart). That keeps async UI code smaller and easier to follow than custom `useEffect` chains per route.
 
 ## Alternatives considered
 
-**`useEffect` + `useState` + manual `fetch` / Axios**
+**Manual `useEffect` + `useState` + Axios**
 
-- Pros: No extra library; full control.
-- Cons: Repeated boilerplate; easy to miss deduplication, cancellation, and cache behavior; harder to test the same way everywhere.
+- **Pros:** No extra dependency; total control.
+- **Cons:** Repeated patterns; easy to get wrong; no built-in deduplication or shared cache across components.
 
 **SWR**
 
-- Pros: Good for many fetch-and-cache cases; small API.
-- Cons: We picked React Query for **first-class query keys**, devtools patterns, and alignment with TanStack tools already used here.
-
-**React Query**
-
-- Pros: Strong defaults for cache, deduplication, background refetch; clear split between **server state** and **client state** (cart stays in Zustand). Reduces **async UI complexity**: derived loading/error/success, cached `data`, and `refetch` replace a lot of bespoke state machines per screen.
-- Cons: Learning curve; another dependency; easy to misuse if all UI state goes into queries.
+- **Pros:** Lightweight; good for fetch-and-cache flows.
+- **Cons:** We preferred React Query for query-key conventions, devtools, and consistency with other TanStack usage in the project.
 
 ## When not to use React Query
 
-- **Pure UI state** (modals, toggles, form drafts before submit) — use React state or a small store.
-- **Data already in memory** (props, Zustand) — no query needed.
+- **UI-only state** (modals, toggles, draft form fields before submit) — React state or a small store.
+- **Data you already have** (props, Zustand) — no network round-trip, no query.
 
 ## Trade-offs
 
-- Server state is split: **React Query** for remote product data **and** the checkout **mutation**, **Zustand** for cart. That is on purpose: different lifecycles and persistence.
+- Team must learn React Query concepts (keys, stale vs garbage-collected data, mutations).
+- Misuse risk: putting *all* state in queries blurs server vs client concerns—cart and ephemeral UI stay out of React Query on purpose.
 
 ## References
 

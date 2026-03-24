@@ -16,7 +16,8 @@ export function App() {
 
   return (
     <HelmetProvider>
-      <BrowserRouter>
+      {/* RR v6 future flags → v7 defaults; see https://reactrouter.com/v6/upgrading/future */}
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
           <Route element={<RootLayout cartCount={cartCount} />}>
             <Route path="/" element={<HomePage />} />

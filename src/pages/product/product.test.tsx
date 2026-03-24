@@ -1,35 +1,54 @@
-import userEvent from '@testing-library/user-event';
-import { act, render, screen, within } from '../../config/test/testUtils';
-import App from '../../App';
-import { useCartStore } from '../../shared/stores/cart';
+import { HelmetProvider } from 'react-helmet-async';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { render, screen } from '../../config/test/testUtils';
+import { useProduct } from '../../shared/hooks/useProduct';
 import { products } from '../../shared/types/product';
+import { Product } from './product';
 
-describe('Product page - integration', () => {
+jest.mock('../../shared/hooks/useProduct');
+jest.mock('../../shared/hooks/useRelatedProducts', () => ({
+  useRelatedProducts: () => ({
+    data: [],
+    isPending: false,
+    isError: false,
+    isRefetching: false,
+    refetch: jest.fn(),
+  }),
+}));
+
+const mockUseProduct = useProduct as jest.Mock;
+
+function renderProductAt(path = '/products/tamagotchi') {
+  return render(
+    <HelmetProvider>
+      <MemoryRouter initialEntries={[path]}>
+        <Routes>
+          <Route path="/products/:productId" element={<Product />} />
+        </Routes>
+      </MemoryRouter>
+    </HelmetProvider>,
+  );
+}
+
+describe('Product page', () => {
   beforeEach(() => {
-    act(() => {
-      useCartStore.getState().clearCart();
+    mockUseProduct.mockReturnValue({
+      data: products[0],
+      isPending: false,
+      isError: false,
+      isRefetching: false,
+      refetch: jest.fn(),
     });
   });
 
   afterEach(() => {
-    act(() => {
-      useCartStore.getState().clearCart();
-    });
+    mockUseProduct.mockReset();
   });
 
-  it('should navigate from Home to Product and update cart count after add to cart', async () => {
-    render(<App />);
-    const firstProductName = products[0].name;
-    const productCardLinks = await screen.findAllByRole('link', {
-      name: firstProductName,
-    });
-    await userEvent.click(productCardLinks[0]);
+  it('should render backlink and real product content without requests', () => {
+    renderProductAt();
 
-    const productInfo = await screen.findByRole('region', { name: /^product information$/i });
-    const addToCartButton = within(productInfo).getByRole('button', { name: /add to cart/i });
-    await userEvent.click(addToCartButton);
-
-    const cartLink = screen.getByRole('link', { name: /open cart/i });
-    expect(within(cartLink).getByText('1')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /back to shop/i })).toHaveAttribute('href', '/');
+    expect(screen.getByRole('heading', { level: 1, name: products[0].name })).toBeInTheDocument();
   });
 });

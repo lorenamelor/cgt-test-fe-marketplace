@@ -39,11 +39,6 @@ We also use **semantic HTML** and a clear heading order (see project README — 
 - Pros: No extra library.
 - Cons: Easy to forget meta tags; harder to update many tags; no built-in order for nested components.
 
-**react-helmet-async**
-
-- Pros: Async-safe; declarative head updates; works well with React 18.
-- Cons: Still **client-side** — crawlers that do not run JS mostly see the shell.
-
 ## Limits (trade-off)
 
 - **Strong SEO for a large changing catalog** usually needs **SSR or SSG** (e.g. Next.js, Remix) so HTML includes content on first response. This ADR does not claim SSR-level SEO; it describes **what we do in a CRA SPA**. See README for SSR, dynamic sitemaps, and `hreflang` later.

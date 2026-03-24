@@ -7,6 +7,24 @@ import {
   WritableStream as NodeWritableStream,
 } from 'stream/web';
 
+jest.mock('react-router-dom', () => {
+  const actual = jest.requireActual('react-router-dom') as typeof import('react-router-dom');
+  const React = jest.requireActual('react') as typeof import('react');
+
+  return {
+    ...actual,
+    MemoryRouter: (props: Record<string, unknown>) =>
+      React.createElement(actual.MemoryRouter, {
+        ...props,
+        future: {
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+          ...(props.future as Record<string, unknown> | undefined),
+        },
+      }),
+  };
+});
+
 configure({ asyncUtilTimeout: 10000 });
 jest.setTimeout(15000);
 

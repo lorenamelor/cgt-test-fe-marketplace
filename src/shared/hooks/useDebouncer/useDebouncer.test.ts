@@ -18,8 +18,7 @@ describe('useDebouncer', () => {
 
   it('updates the debounced value after the delay', () => {
     const { result, rerender } = renderHook(
-      ({ value, delay }: { value: string; delay: number }) =>
-        useDebouncer(value, delay),
+      ({ value, delay }: { value: string; delay: number }) => useDebouncer(value, delay),
       { initialProps: { value: 'first', delay: 300 } },
     );
 
@@ -34,8 +33,7 @@ describe('useDebouncer', () => {
 
   it('resets the timer when the value changes before the delay elapses', () => {
     const { result, rerender } = renderHook(
-      ({ value, delay }: { value: string; delay: number }) =>
-        useDebouncer(value, delay),
+      ({ value, delay }: { value: string; delay: number }) => useDebouncer(value, delay),
       { initialProps: { value: 'a', delay: 300 } },
     );
 
@@ -59,8 +57,7 @@ describe('useDebouncer', () => {
 
   it('respects a change in delayMs', () => {
     const { result, rerender } = renderHook(
-      ({ value, delay }: { value: string; delay: number }) =>
-        useDebouncer(value, delay),
+      ({ value, delay }: { value: string; delay: number }) => useDebouncer(value, delay),
       { initialProps: { value: 'x', delay: 500 } },
     );
 

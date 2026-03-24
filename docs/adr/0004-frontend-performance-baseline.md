@@ -18,10 +18,10 @@ To keep this path fast, we follow simple rules we can check with Web Vitals.
    - Details: ADR 0003.
 
 2. **List items**
-   - Use `React.memo` on repeated list cards/items when props are stable enough.
-   - **Why it helps here:** Home and cart parents often re-render for reasons that do not change every row (e.g. cart totals, filters, hover or layout state, context updates). Without memo, React still walks and reconciles every list child; with memo, rows whose props are shallow-equal skip that subtree. That cuts work proportional to list size and improves responsiveness (INP) on mid-tier devices.
-   - **When it is justified:** Many identical-shaped children, render cost that is not trivial (image + text + links), and props that stay referentially stable for unchanged items (stable handlers via `useCallback` / store selectors, or data passed from immutable snapshots).
-   - **When it is not enough:** If the parent passes new object/array/function references every render, memo never bails out—fix prop stability first. Do not memo leaf components that are cheap and rarely list-mounted; the comparison cost can outweigh the win.
+   - Wrap repeated list rows (cards, cart lines) in `React.memo` when their props stay stable between parent re-renders.
+   - **Why:** On Home and Cart the *page* often re-renders (totals, filters, hover, context) even when *each row’s data* did not change. Without `memo`, React still re-renders every row. With `memo`, unchanged rows are skipped after a quick prop check—less work on long lists and snappier interaction (INP), especially on slower devices.
+   - **Use it when:** The list is long or each row is non-trivial (e.g. image + text + actions), and you can keep props stable (e.g. `useCallback` for handlers, narrow store selectors, immutable item data).
+   - **Skip or fix first when:** The parent passes new objects, arrays, or inline functions every render—`memo` will not help until props are stable. Also skip `memo` on tiny one-off components; comparing props can cost more than re-rendering them once.
    - Today: `ProductCard`, `CartItem`.
 
 3. **Images**

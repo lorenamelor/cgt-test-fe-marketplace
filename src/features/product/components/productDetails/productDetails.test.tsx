@@ -15,7 +15,7 @@ function renderDetails(overrides: Partial<ProductDetailsProps> = {}) {
   const onAddToCart = jest.fn();
   const onAddAndGoToCart = jest.fn();
 
-  const result = render(
+  const view = render(
     <ProductDetails
       product={product}
       details={defaultDetails}
@@ -27,7 +27,7 @@ function renderDetails(overrides: Partial<ProductDetailsProps> = {}) {
     />,
   );
 
-  return { ...result, onAddToCart, onAddAndGoToCart };
+  return { ...view, onAddToCart, onAddAndGoToCart };
 }
 
 describe('ProductDetails', () => {
@@ -66,4 +66,3 @@ describe('ProductDetails', () => {
     expect(onAddAndGoToCart).toHaveBeenCalledWith(product.id);
   });
 });
-

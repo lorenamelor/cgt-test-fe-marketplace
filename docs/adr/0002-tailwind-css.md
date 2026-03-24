@@ -25,15 +25,15 @@ We use **Tailwind CSS** as the main way to style the UI.
 
 ### Alternatives considered
 
-**Plain CSS (global / SCSS)**
+**Global CSS or SCSS (no CSS Modules)**
 
-- Pros: No extra runtime; standard CSS.
-- Cons: More boilerplate and naming; more duplicate styles; harder to share tokens; global CSS can cause surprise side effects.
+- Pros: No extra runtime; standard CSS; SCSS adds variables, nesting, and partials if the team already uses it.
+- Cons: More boilerplate and naming; more duplicate styles; harder to share tokens in one place; global selectors can cause surprise side effects.
 
-**CSS Modules**
+**CSS Modules (often with SCSS)**
 
-- Pros: Scoped class names reduce global clashes; styles stay next to components; familiar to teams used to component CSS.
-- Cons: Still more boilerplate than utilities for simple layouts; duplicate values unless you add variables or a token layer; sharing a single design system across features needs explicit conventions (e.g. `:global`, shared partials, or CSS variables).
+- Pros: Scoped class names reduce global clashes; styles stay next to components; SCSS in `.module.scss` is a common combo for variables, mixins, and nesting while keeping component boundaries.
+- Cons: Still more boilerplate than utilities for simple layouts; duplicate values unless you add variables, shared partials, or CSS variables; sharing one design system across features needs explicit conventions (e.g. `:global`, shared token files).
 
 **UI library (e.g. Material UI, Chakra UI)**
 
@@ -48,5 +48,5 @@ We use **Tailwind CSS** as the main way to style the UI.
   - Smaller CSS in production: only utilities that are used are generated.
 
 - **Negative**
-  - JSX can get long with many classes; we reduce this with shared components.
+  - JSX can get long with many classes; we reduce this with compound components.
   - Team must learn Tailwind naming and config; IDE autocomplete and PR review help.

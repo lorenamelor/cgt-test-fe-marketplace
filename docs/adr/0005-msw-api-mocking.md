@@ -43,6 +43,10 @@ Product and order handlers (e.g. `GET /api/products`, `GET /api/products/:id`, r
 - MSW needs setup (worker in `public/`, server lifecycle in tests). The upside is **stable contracts** and fewer hand-written mocks.
 - When a real API exists, handlers may become **contract tests** or go away; mocking at the **network layer** still makes sense.
 
+### Production and performance
+
+In this codebase the MSW worker may also start in **production** (for example a demo deploy without a backend). That does **not** reflect a real product setup: in true production MSW should stay **off** and the app should call the real API. Service worker startup and the interception layer tend to **hurt loading metrics** versus a build that does not register MSW; treat that as acceptable only for demos or an MVP without an API.
+
 ## References
 
 - [MSW – Documentation](https://mswjs.io/docs/)

@@ -6,9 +6,7 @@ describe('QuantityStepper', () => {
     const onIncrement = jest.fn();
     const onDecrement = jest.fn();
 
-    render(
-      <QuantityStepper quantity={2} onIncrement={onIncrement} onDecrement={onDecrement} />,
-    );
+    render(<QuantityStepper quantity={2} onIncrement={onIncrement} onDecrement={onDecrement} />);
 
     expect(screen.getByText('2')).toBeInTheDocument();
 
